@@ -100,6 +100,190 @@
                             "defaultValue": 0
                         }
                     ]
+                },
+                {
+                    "id": "f3ce6d68-7c99-47e0-8c2b-17b39ead24e5",
+                    "name": "temperatureSensor",
+                    "displayName": "Temperature sensor",
+                    "interfaces": ["temperaturesensor", "wirelessconnectable", "battery"],
+                    "paramTypes": [
+                        {
+                            "id": "4c850b3c-2bf8-4640-8be9-fbd538c63076",
+                            "name": "ieeeAddress",
+                            "displayName": "IEEE adress",
+                            "type": "QString",
+                            "defaultValue": "00:00:00:00:00:00:00:00"
+                        },
+                        {
+                            "id": "47ec14d4-53be-4d7c-94fb-8d2fe4943cfb",
+                            "name": "networkUuid",
+                            "displayName": "Zigbee network UUID",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "1f6374ca-11ea-4686-ab9d-067112dd4ea2",
+                            "name": "endpointId",
+                            "displayName": "Endpoint ID",
+                            "type": "uint",
+                            "defaultValue": 1
+                        },
+                        {
+                            "id": "b5464b56-546c-4fd7-857b-ed586632c15a",
+                            "name": "manufacturer",
+                            "displayName": "Manufacturer",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "22ea0cf2-0840-4910-b80e-aebd020de868",
+                            "name": "model",
+                            "displayName": "Model",
+                            "type": "QString",
+                            "defaultValue": ""
+                        }
+                    ],
+                    "stateTypes": [
+                        {
+                            "id": "3652627f-7add-4354-a94b-4cb1b218b774",
+                            "name": "batteryCritical",
+                            "displayName": "Battery critical",
+                            "displayNameEvent": "Battery critical changed",
+                            "type": "bool",
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "ec7f1fd9-f92e-41e5-bd2d-a6772bf9f7e3",
+                            "name": "connected",
+                            "displayName": "Connected",
+                            "displayNameEvent": "Connected or disconnected",
+                            "type": "bool",
+                            "defaultValue": false,
+                            "cached": false
+                        },
+                        {
+                            "id": "ffee87f0-f0b2-4a62-b947-05f5895c88d9",
+                            "name": "signalStrength",
+                            "displayName": "Signal strength",
+                            "displayNameEvent": "Signal strength changed",
+                            "type": "uint",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "unit": "Percentage",
+                            "defaultValue": 0
+                        },
+                        {
+                            "id": "8706e296-9501-48aa-8321-02eac43cde1b",
+                            "name": "temperature",
+                            "displayName": "Temperature",
+                            "displayNameEvent": "Temperature changed",
+                            "type": "double",
+                            "unit": "DegreeCelsius",
+                            "defaultValue": 0
+                        }
+                    ]
+                },
+                {
+                    "id": "cea7f102-3387-48cc-aa0e-dfce650d3e6f",
+                    "name": "htSensor",
+                    "displayName": "Temperature & humidity sensor",
+                    "interfaces": ["temperaturesensor", "humiditysensor", "wirelessconnectable", "battery"],
+                    "paramTypes": [
+                        {
+                            "id": "e44de9ee-3a56-477c-b592-d1db1312aeff",
+                            "name": "ieeeAddress",
+                            "displayName": "IEEE adress",
+                            "type": "QString",
+                            "defaultValue": "00:00:00:00:00:00:00:00"
+                        },
+                        {
+                            "id": "ef153c97-989d-48c1-a5b2-d5255115b7d0",
+                            "name": "networkUuid",
+                            "displayName": "Zigbee network UUID",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "6eb7379d-4a05-42c3-88ce-09e69639073d",
+                            "name": "endpointId",
+                            "displayName": "Endpoint ID",
+                            "type": "uint",
+                            "defaultValue": 1
+                        },
+                        {
+                            "id": "d5ba067a-d140-4d71-8aaf-0d38ecfbe29b",
+                            "name": "manufacturer",
+                            "displayName": "Manufacturer",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "2df0f996-144e-4ab8-9e89-31fd4d7bed7c",
+                            "name": "model",
+                            "displayName": "Model",
+                            "type": "QString",
+                            "defaultValue": ""
+                        }
+                    ],
+                    "stateTypes": [
+                        {
+                            "id": "e28eb95b-936a-4e08-bf4f-61e88203a8d1",
+                            "name": "temperature",
+                            "displayName": "Temperature",
+                            "displayNameEvent": "Temperature changed",
+                            "type": "double",
+                            "unit": "DegreeCelsius",
+                            "defaultValue": 0
+                        },
+                        {
+                            "id": "233e744d-e3d7-4ebc-83a3-a689f229c604",
+                            "name": "humidity",
+                            "displayName": "Relative humidity",
+                            "displayNameEvent": "Relative humidity changed",
+                            "type": "double",
+                            "unit": "Percentage",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "defaultValue": 0
+                        },
+                        {
+                            "id": "99562fab-1d31-4cdc-bc27-eea7364357d7",
+                            "name": "batteryCritical",
+                            "displayName": "Battery critical",
+                            "displayNameEvent": "Battery critical changed",
+                            "type": "bool",
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "5b379c96-65b5-4af5-a75d-95ade9f6269b",
+                            "name": "connected",
+                            "displayName": "Connected",
+                            "displayNameEvent": "Connected or disconnected",
+                            "type": "bool",
+                            "defaultValue": false,
+                            "cached": false
+                        },
+                        {
+                            "id": "6e8891fd-cb5f-43d5-8043-7e9f92bd1611",
+                            "name": "signalStrength",
+                            "displayName": "Signal strength",
+                            "displayNameEvent": "Signal strength changed",
+                            "type": "uint",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "unit": "Percentage",
+                            "defaultValue": 0
+                        },
+                        {
+                            "id": "d46099b4-a28b-4e70-82a0-864588159710",
+                            "name": "version",
+                            "displayName": "Version",
+                            "displayNameEvent": "Version changed",
+                            "type": "QString",
+                            "cached": true,
+                            "defaultValue": ""
+                        }
+                    ]
                 }
             ]
         }

@@ -70,6 +70,26 @@ bool IntegrationPluginZigbeeTuya::handleNode(ZigbeeNode *node, const QUuid &/*ne
         createThing(powerSocketThingClassId, node);
 
         return true;
+    } else if (node->nodeDescriptor().manufacturerCode == 0x1141 && node->modelName() == "TS0201") {
+
+
+        ZigbeeNodeEndpoint *endpoint = node->getEndpoint(0x01);
+        if (!endpoint) {
+            qCWarning(dcZigbeeTuya()) << "Endpoint 1 not found on device....";
+            return false;
+        }
+
+
+        if (endpoint->hasInputCluster(ZigbeeClusterLibrary::ClusterIdRelativeHumidityMeasurement)) {
+            qCInfo(dcZigbeeTuya()) << "H/T sensor device found!";
+            createThing(htSensorThingClassId, node, {Param(htSensorThingEndpointIdParamTypeId, endpoint->endpointId())});
+            bindRelativeHumidityMeasurementInputCluster(endpoint);
+        } else {
+            qCInfo(dcZigbeeTuya()) << "Temperature sensor device found!";
+            createThing(temperatureSensorThingClassId, node, {Param(temperatureSensorThingEndpointIdParamTypeId, endpoint->endpointId())});
+        }
+
+        return true;
     }
 
     return false;
@@ -87,6 +107,27 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
 
     ZigbeeNode *node = nodeForThing(thing);
     ZigbeeNodeEndpoint *endpoint = node->getEndpoint(0x01);
+
+
+
+    // Set the version
+    thing->setStateValue("version", endpoint->softwareBuildId());
+
+    if (thing->hasState("battery")) {
+        connectToPowerConfigurationCluster(thing, endpoint);
+    }
+
+    if (thing->thingClassId() == temperatureSensorThingClassId) {
+        qCDebug(dcZigbeeTuya()) << "Setting up temperature sensor" << thing->name() << endpoint->endpointId();;
+        connectToTemperatureMeasurementInputCluster(thing, endpoint);
+    }
+
+    if (thing->thingClassId() == htSensorThingClassId) {
+        qCDebug(dcZigbeeTuya()) << "Setting up h/t sensor" << thing->name() << endpoint->endpointId();;
+        connectToTemperatureMeasurementInputCluster(thing, endpoint);
+        connectToRelativeHumidityMeasurementInputCluster(thing, endpoint);
+    }
+
 
     if (thing->thingClassId() == powerSocketThingClassId) {
         connectToOnOffCluster(thing, endpoint);
