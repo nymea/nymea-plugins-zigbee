@@ -273,15 +273,6 @@
                             "maxValue": 100,
                             "unit": "Percentage",
                             "defaultValue": 0
-                        },
-                        {
-                            "id": "d46099b4-a28b-4e70-82a0-864588159710",
-                            "name": "version",
-                            "displayName": "Version",
-                            "displayNameEvent": "Version changed",
-                            "type": "QString",
-                            "cached": true,
-                            "defaultValue": ""
                         }
                     ]
                 }

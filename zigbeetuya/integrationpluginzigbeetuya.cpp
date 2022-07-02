@@ -110,9 +110,6 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
 
 
 
-    // Set the version
-    thing->setStateValue("version", endpoint->softwareBuildId());
-
     if (thing->hasState("battery")) {
         connectToPowerConfigurationCluster(thing, endpoint);
     }
