@@ -158,9 +158,9 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
         }
 
 
-        // Attribute reporting seems not to be working for some of the models, we'll need to poll
+        // Attribute reporting seems not to be working for totalEnergyConsumed, we'll need to poll
         if (!m_energyPollTimer) {
-            m_energyPollTimer = hardwareManager()->pluginTimerManager()->registerTimer(5);
+            m_energyPollTimer = hardwareManager()->pluginTimerManager()->registerTimer(5 * 60);
             connect(m_energyPollTimer, &PluginTimer::timeout, this, &IntegrationPluginZigbeeTuya::pollEnergyMeters);
         }
 
@@ -448,13 +448,6 @@ void IntegrationPluginZigbeeTuya::pollEnergyMeters()
     foreach (Thing *thing, myThings().filterByThingClassId(powerSocketThingClassId)) {
         ZigbeeNode *node = nodeForThing(thing);
         ZigbeeNodeEndpoint *endpoint = node->getEndpoint(0x01);
-        ZigbeeClusterElectricalMeasurement *electricalMeasurementCluster = endpoint->inputCluster<ZigbeeClusterElectricalMeasurement>(ZigbeeClusterLibrary::ClusterIdElectricalMeasurement);
-        electricalMeasurementCluster->readAttributes(
-                    {
-                        ZigbeeClusterElectricalMeasurement::AttributeACPhaseAMeasurementActivePower,
-                        ZigbeeClusterElectricalMeasurement::AttributeACPhaseAMeasurementRMSCurrent,
-                        ZigbeeClusterElectricalMeasurement::AttributeACPhaseAMeasurementRMSVoltage
-                    });
         ZigbeeClusterMetering *meteringCluster = endpoint->inputCluster<ZigbeeClusterMetering>(ZigbeeClusterLibrary::ClusterIdMetering);
         meteringCluster->readAttributes({ZigbeeClusterMetering::AttributeCurrentSummationDelivered});
     }
