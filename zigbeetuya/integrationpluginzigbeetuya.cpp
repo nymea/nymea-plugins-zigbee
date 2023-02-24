@@ -114,10 +114,10 @@ bool IntegrationPluginZigbeeTuya::handleNode(ZigbeeNode *node, const QUuid &/*ne
         bindOnOffCluster(endpoint);
         configureOnOffInputClusterAttributeReporting(endpoint);
 
-        bindElectricalMeasurementCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdElectricalMeasurement);
         configureElectricalMeasurementInputClusterAttributeReporting(endpoint);
 
-        bindMeteringCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdMetering);
         configureMeteringInputClusterAttributeReporting(endpoint);
 
         createThing(powerSocketThingClassId, node);

@@ -107,8 +107,13 @@ bool IntegrationPluginZigbeeLumi::handleNode(ZigbeeNode *node, const QUuid &/*ne
 
         } else if (endpoint->modelIdentifier() == "lumi.plug.maeu01" || endpoint->modelIdentifier() == "lumi.plug.mmeu01") {
             thingClassId = lumiPowerSocketThingClassId;
-            bindElectricalMeasurementCluster(endpoint);
-            bindMeteringCluster(endpoint);
+
+            bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdElectricalMeasurement);
+            configureElectricalMeasurementInputClusterAttributeReporting(endpoint);
+
+            bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdMetering);
+            configureMeteringInputClusterAttributeReporting(endpoint);
+
 
         } else {
             foreach (const QString &knownLumi, m_knownLumiDevices.keys()) {
