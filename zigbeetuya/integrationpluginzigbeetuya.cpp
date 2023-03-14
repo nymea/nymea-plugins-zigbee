@@ -111,7 +111,7 @@ bool IntegrationPluginZigbeeTuya::handleNode(ZigbeeNode *node, const QUuid &/*ne
             return false;
         }
 
-        bindOnOffCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdOnOff);
         configureOnOffInputClusterAttributeReporting(endpoint);
 
         bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdElectricalMeasurement);
@@ -141,8 +141,11 @@ bool IntegrationPluginZigbeeTuya::handleNode(ZigbeeNode *node, const QUuid &/*ne
             qCWarning(dcZigbeeTuya()) << "Endpoint 1 not found on device....";
             return false;
         }
-        bindPowerConfigurationCluster(endpoint);
-        bindIasZoneCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
+        configurePowerConfigurationInputClusterAttributeReporting(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdIasZone);
+        configureIasZoneInputClusterAttributeReporting(endpoint);
+        enrollIasZone(endpoint, 0x42);
         createThing(vibrationSensorThingClassId, node);
         return true;
     }

@@ -69,11 +69,11 @@ bool IntegrationPluginZigbeeGewiss::handleNode(ZigbeeNode *node, const QUuid &/*
             return false;
         }
 
-        bindPowerConfigurationCluster(endpoint1);
+        bindCluster(endpoint1, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
         configurePowerConfigurationInputClusterAttributeReporting(endpoint1);
 
-        bindOnOffCluster(endpoint2);
-        bindOnOffCluster(endpoint1);
+        bindCluster(endpoint1, ZigbeeClusterLibrary::ClusterIdOnOff);
+        bindCluster(endpoint2, ZigbeeClusterLibrary::ClusterIdOnOff);
 
         // Device supports BinaryInput but that doesn't seem to report any attribute changes, no matter the DIP switches
         // Device supports LevelControl. We could bind that for longpress, but binding it changes the behavior of the OnOff
@@ -89,8 +89,9 @@ bool IntegrationPluginZigbeeGewiss::handleNode(ZigbeeNode *node, const QUuid &/*
     }
 
     if (node->modelName().startsWith("GWA1521")) {
-        ZigbeeNodeEndpoint *endpoint1 = node->getEndpoint(0x01);
-        bindOnOffCluster(endpoint1);
+        ZigbeeNodeEndpoint *endpoint = node->getEndpoint(0x01);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdOnOff);
+        configureOnOffInputClusterAttributeReporting(endpoint);
         createThing(gwa1521ActuatorThingClassId, node);
         return true;
     }

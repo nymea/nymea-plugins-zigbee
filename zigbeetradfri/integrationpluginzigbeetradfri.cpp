@@ -85,9 +85,9 @@ bool IntegrationPluginZigbeeTradfri::handleNode(ZigbeeNode *node, const QUuid &/
 
         qCDebug(dcZigbeeTradfri()) << "Handling dimmable light for" << node << endpoint;
         createThing(dimmableLightThingClassId, node);
-        bindOnOffCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdOnOff);
         configureOnOffInputClusterAttributeReporting(endpoint);
-        bindLevelControlCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdLevelControl);
         configureLevelControlInputClusterAttributeReporting(endpoint);
         return true;
     }
@@ -99,11 +99,11 @@ bool IntegrationPluginZigbeeTradfri::handleNode(ZigbeeNode *node, const QUuid &/
 
         qCDebug(dcZigbeeTradfri()) << "Handling color temperature light for" << node << endpoint;
         createThing(colorTemperatureLightThingClassId, node);
-        bindOnOffCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdOnOff);
         configureOnOffInputClusterAttributeReporting(endpoint);
-        bindLevelControlCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdLevelControl);
         configureLevelControlInputClusterAttributeReporting(endpoint);
-        bindColorControlCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdColorControl);
         configureColorControlInputClusterAttributeReporting(endpoint);
         return true;
     }
@@ -115,11 +115,11 @@ bool IntegrationPluginZigbeeTradfri::handleNode(ZigbeeNode *node, const QUuid &/
 
         qCDebug(dcZigbeeTradfri()) << "Handling color light for" << node << endpoint;
         createThing(colorLightThingClassId, node);
-        bindOnOffCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdOnOff);
         configureOnOffInputClusterAttributeReporting(endpoint);
-        bindLevelControlCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdLevelControl);
         configureLevelControlInputClusterAttributeReporting(endpoint);
-        bindColorControlCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdColorControl);
         configureColorControlInputClusterAttributeReporting(endpoint);
         return true;
     }
@@ -128,18 +128,18 @@ bool IntegrationPluginZigbeeTradfri::handleNode(ZigbeeNode *node, const QUuid &/
         if (endpoint->modelIdentifier().contains("on/off switch")) {
             qCDebug(dcZigbeeTradfri()) << "Handling TRADFRI on/off switch" << node << endpoint;
             createThing(onOffSwitchThingClassId, node);
-            bindPowerConfigurationCluster(endpoint);
+            bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
             configurePowerConfigurationInputClusterAttributeReporting(endpoint);
-            bindOnOffCluster(endpoint);
-            bindLevelControlCluster(endpoint);
+            bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdOnOff);
+            bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdLevelControl);
             return true;
         } else if (endpoint->modelIdentifier().toLower().contains("shortcut button")) {
             qCDebug(dcZigbeeTradfri()) << "Handling TRADFRI SHORTCUT Button" << node << endpoint;
             createThing(shortcutButtonThingClassId, node);
-            bindPowerConfigurationCluster(endpoint);
+            bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
             configurePowerConfigurationInputClusterAttributeReporting(endpoint);
-            bindOnOffCluster(endpoint);
-            bindLevelControlCluster(endpoint);
+            bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdOnOff);
+            bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdLevelControl);
             return true;
         }
     }
@@ -147,29 +147,29 @@ bool IntegrationPluginZigbeeTradfri::handleNode(ZigbeeNode *node, const QUuid &/
     if (endpoint->profile() == Zigbee::ZigbeeProfileHomeAutomation && endpoint->deviceId() == Zigbee::HomeAutomationDeviceOnOffSensor) {
         qCDebug(dcZigbeeTradfri()) << "Handling TRADFRI motion sensor" << node << endpoint;
         createThing(motionSensorThingClassId, node);
-        bindPowerConfigurationCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
         configurePowerConfigurationInputClusterAttributeReporting(endpoint);
-        bindOnOffCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdOnOff);
         return true;
     }
 
     if (endpoint->modelIdentifier().contains("remote control")) {
         qCDebug(dcZigbeeTradfri()) << "Handling TRADFRI remote control" << node << endpoint;
         createThing(remoteThingClassId, node);
-        bindPowerConfigurationCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
         configurePowerConfigurationInputClusterAttributeReporting(endpoint);
-        bindOnOffCluster(endpoint);
-        bindLevelControlCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdOnOff);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdLevelControl);
         return true;
     }
 
     if (endpoint->modelIdentifier().contains("SYMFONISK")) {
         qCDebug(dcZigbeeTradfri()) << "Handling TRADFRI Symfonisk sound remote" << node << endpoint;
         createThing(soundRemoteThingClassId, node);
-        bindPowerConfigurationCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
         configurePowerConfigurationInputClusterAttributeReporting(endpoint);
-        bindOnOffCluster(endpoint);
-        bindLevelControlCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdOnOff);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdLevelControl);
         return true;
     }
 

@@ -76,19 +76,11 @@ protected:
     virtual void createThing(const ThingClassId &thingClassId, ZigbeeNode *node, const ParamList &additionalParams = ParamList());
 
     void bindCluster(ZigbeeNodeEndpoint *endpoint, ZigbeeClusterLibrary::ClusterId clusterId, int retries = 3);
-    void bindPowerConfigurationCluster(ZigbeeNodeEndpoint *endpoint);
-    void bindThermostatCluster(ZigbeeNodeEndpoint *endpoint);
-    void bindOnOffCluster(ZigbeeNodeEndpoint *endpoint, int retries = 3);
-    void bindLevelControlCluster(ZigbeeNodeEndpoint *endpoint);
-    void bindColorControlCluster(ZigbeeNodeEndpoint *endpoint);
-    void bindTemperatureMeasurementCluster(ZigbeeNodeEndpoint *endpoint, int retries = 3);
-    void bindRelativeHumidityMeasurementCluster(ZigbeeNodeEndpoint *endpoint, int retries = 3);
-    void bindIasZoneCluster(ZigbeeNodeEndpoint *endpoint);
-    void bindIlluminanceMeasurementCluster(ZigbeeNodeEndpoint *endpoint, int retries = 3);
-    void bindOccupancySensingCluster(ZigbeeNodeEndpoint *endpoint);
-    void bindFanControlCluster(ZigbeeNodeEndpoint *endpoint);
+
+    void enrollIasZone(ZigbeeNodeEndpoint *endpoint, quint8 zoneId);
 
     void configurePowerConfigurationInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
+    void configureThermostatClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
     void configureOnOffInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
     void configureLevelControlInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
     void configureColorControlInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
@@ -99,6 +91,7 @@ protected:
     void configureIlluminanceMeasurementInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
     void configureOccupancySensingInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
     void configureFanControlInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
+    void configureIasZoneInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
 
     void connectToPowerConfigurationInputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, qreal maxVoltage = 0, qreal minVoltage = 0);
     void connectToThermostatCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint);

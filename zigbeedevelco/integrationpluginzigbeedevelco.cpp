@@ -80,9 +80,9 @@ bool IntegrationPluginZigbeeDevelco::handleNode(ZigbeeNode *node, const QUuid &n
         createThing(airQualitySensorThingClassId, node);
 
         ZigbeeNodeEndpoint *endpoint = node->getEndpoint(DEVELCO_EP_TEMPERATURE_SENSOR);
-        bindTemperatureMeasurementCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdTemperatureMeasurement);
         configureTemperatureMeasurementInputClusterAttributeReporting(endpoint);
-        bindRelativeHumidityMeasurementCluster(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdRelativeHumidityMeasurement);
         configureRelativeHumidityMeasurementInputClusterAttributeReporting(endpoint);
 
         configureBattryVoltageReporting(node, endpoint);
@@ -136,19 +136,21 @@ bool IntegrationPluginZigbeeDevelco::handleNode(ZigbeeNode *node, const QUuid &n
 
             }
 
-            bindIasZoneCluster(iasZoneEndpoint);
+            bindCluster(iasZoneEndpoint, ZigbeeClusterLibrary::ClusterIdIasZone);
+            configureIasZoneInputClusterAttributeReporting(iasZoneEndpoint);
+            enrollIasZone(iasZoneEndpoint, 0x42);
 
             // IAS Zone devices (at least fire, water and sensors) have a temperature sensor endpoint too
             ZigbeeNodeEndpoint *temperatureSensorEndpoint = node->getEndpoint(DEVELCO_EP_TEMPERATURE_SENSOR);
             if (temperatureSensorEndpoint) {
-                bindTemperatureMeasurementCluster(temperatureSensorEndpoint);
+                bindCluster(temperatureSensorEndpoint, ZigbeeClusterLibrary::ClusterIdTemperatureMeasurement);
                 configureTemperatureMeasurementInputClusterAttributeReporting(temperatureSensorEndpoint);
             }
 
             // Some have a light sensor (at least the motion sensor)
             ZigbeeNodeEndpoint *lightSensorEndpoint = node->getEndpoint(DEVELCO_EP_LIGHT_SENSOR);
             if (lightSensorEndpoint) {
-                bindIlluminanceMeasurementCluster(lightSensorEndpoint);
+                bindCluster(lightSensorEndpoint, ZigbeeClusterLibrary::ClusterIdIlluminanceMeasurement);
                 configureIlluminanceMeasurementInputClusterAttributeReporting(lightSensorEndpoint);
             }
 
