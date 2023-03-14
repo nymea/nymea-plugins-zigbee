@@ -130,11 +130,19 @@ ZigbeeNode* ZigbeeIntegrationPlugin::manageNode(Thing *thing)
     connect(node, &ZigbeeNode::lastSeenChanged, this, [=](){
         while (!m_delayedWriteRequests.value(node).isEmpty()) {
             DelayedAttributeWriteRequest request = m_delayedWriteRequests[node].takeFirst();
-            request.cluster->writeAttributes(request.records, request.manufacturerCode);
+            ZigbeeClusterReply *reply = request.cluster->writeAttributes(request.records, request.manufacturerCode);
+            connect(reply, &ZigbeeClusterReply::finished, this, [=](){
+                if (reply->error() != ZigbeeClusterReply::ErrorNoError) {
+                    qCWarning(m_dc) << "Error writing attributes on" << thing->name();
+                }
+            });
         }
         while (!m_delayedReadRequests.value(node).isEmpty()) {
             DelayedAttributeReadRequest request = m_delayedReadRequests[node].takeFirst();
-            request.cluster->readAttributes(request.attributes, request.manufacturerCode);
+            ZigbeeClusterReply *reply = request.cluster->readAttributes(request.attributes, request.manufacturerCode);
+            if (reply->error() != ZigbeeClusterReply::ErrorNoError) {
+                qCWarning(m_dc) << "Error writing attributes on" << thing->name();
+            }
         }
     });
 
@@ -1436,6 +1444,13 @@ void ZigbeeIntegrationPlugin::writeAttributesDelayed(ZigbeeCluster *cluster, con
 {
     DelayedAttributeWriteRequest request {cluster, records, manufacturerCode};
     m_delayedWriteRequests[cluster->node()].append(request);
+
+    // We'll only write the attributes once we know the device is awake, that is, when lastSeen changes because we received something
+    // However, the device could be still awake but not sending anything right now and going to sleep soon.
+    // Reading an attribute to trigger the write right away in case it replies.
+    if (records.count() > 0) {
+        cluster->readAttributes({records.first().attributeId}, manufacturerCode);
+    }
 }
 
 void ZigbeeIntegrationPlugin::setFirmwareIndexUrl(const QUrl &url)
