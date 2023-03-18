@@ -88,6 +88,7 @@ protected:
     void configureMeteringInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
     void configureTemperatureMeasurementInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
     void configureRelativeHumidityMeasurementInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
+    void configureAnalogInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
     void configureIlluminanceMeasurementInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
     void configureOccupancySensingInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
     void configureFanControlInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);

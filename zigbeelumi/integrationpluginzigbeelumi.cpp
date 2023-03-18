@@ -60,7 +60,6 @@ IntegrationPluginZigbeeLumi::IntegrationPluginZigbeeLumi():
 {
 
     // Known model identifier
-    m_knownLumiDevices.insert("lumi.sensor_ht", lumiHTSensorThingClassId);
     m_knownLumiDevices.insert("lumi.sensor_magnet", lumiMagnetSensorThingClassId);
     m_knownLumiDevices.insert("lumi.sensor_switch", lumiButtonSensorThingClassId);
     // Check sensor_motion separate since the have the same name but different features
@@ -113,6 +112,24 @@ bool IntegrationPluginZigbeeLumi::handleNode(ZigbeeNode *node, const QUuid &/*ne
 
             bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdMetering);
             configureMeteringInputClusterAttributeReporting(endpoint);
+
+        } else if (endpoint->modelIdentifier() == "lumi.sensor_ht" || endpoint->modelIdentifier() == "lumi.sens") {
+            thingClassId = lumiHTSensorThingClassId;
+
+        } else if (endpoint->modelIdentifier() == "lumi.airmonitor.acn01") {
+            thingClassId = lumiAirMonitorThingClassId;
+
+            bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
+            configurePowerConfigurationInputClusterAttributeReporting(endpoint);
+
+            bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdTemperatureMeasurement);
+            configureTemperatureMeasurementInputClusterAttributeReporting(endpoint);
+
+            bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdRelativeHumidityMeasurement);
+            configureRelativeHumidityMeasurementInputClusterAttributeReporting(endpoint);
+
+            bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdAnalogInput);
+            configureAnalogInputClusterAttributeReporting(endpoint);
 
 
         } else {
@@ -305,6 +322,45 @@ void IntegrationPluginZigbeeLumi::setupThing(ThingSetupInfo *info)
     if (thing->thingClassId() == lumiHTSensorThingClassId) {
         connectToTemperatureMeasurementInputCluster(thing, endpoint);
         connectToRelativeHumidityMeasurementInputCluster(thing, endpoint);
+    }
+
+    if (thing->thingClassId() == lumiAirMonitorThingClassId) {
+        connectToPowerConfigurationInputCluster(thing, endpoint, 3, 2.85);
+        connectToTemperatureMeasurementInputCluster(thing, endpoint);
+        connectToRelativeHumidityMeasurementInputCluster(thing, endpoint);
+        connectToAnalogInputCluster(thing, endpoint, "voc");
+
+        QHash<QString, uint> map = {
+            {"mg/m³ - °C", 0x00},
+            {"ppb - °C", 0x01},
+            {"mg/m³ - °F",0x10},
+            {"ppb³ - °F", 0x11}
+        };
+        ZigbeeCluster *lumiCluster = endpoint->getInputCluster(static_cast<ZigbeeClusterLibrary::ClusterId>(LUMI_CLUSTER_ID));
+        if (lumiCluster) {
+            connect(lumiCluster, &ZigbeeCluster::attributeChanged, thing, [thing, map](const ZigbeeClusterAttribute &attribute){
+                switch (attribute.id()) {
+                case 0x0114: {
+                    quint8 displayUnit = attribute.dataType().toUInt8();
+                    qCDebug(dcZigbeeLumi()) << thing << "Display unit" << displayUnit;
+                    thing->setSettingValue(lumiAirMonitorSettingsDisplayUnitsParamTypeId, map.key(displayUnit));
+                    break;
+                }
+                default:
+                    qCDebug(dcZigbeeLumi()) << thing << "Unhandled attribute report:" << attribute;
+                }
+            });
+            connect(thing, &Thing::settingChanged, lumiCluster, [lumiCluster, map](const ParamTypeId &settingId, const QVariant &value){
+                if (settingId == lumiAirMonitorSettingsDisplayUnitsParamTypeId) {
+                    ZigbeeClusterLibrary::WriteAttributeRecord record;
+                    record.attributeId = 0x0114;
+                    record.dataType = Zigbee::Uint8;
+                    record.data = ZigbeeDataType(map.value(value.toString()), Zigbee::Uint8).data();
+                    lumiCluster->writeAttributes({record}, MANUFACTURER_CODE_XIAOMI);
+                }
+            });
+            lumiCluster->readAttributes({0x0114}, MANUFACTURER_CODE_XIAOMI);
+        }
     }
 
     if (thing->thingClassId() == lumiWeatherSensorThingClassId) {

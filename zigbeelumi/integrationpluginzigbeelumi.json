@@ -90,6 +90,118 @@
                     ]
                 },
                 {
+                    "name": "lumiAirMonitor",
+                    "displayName": "TVOC Air Quality Monitor",
+                    "id": "1a9fb2ea-543e-46b2-a10d-9a977232367b",
+                    "setupMethod": "JustAdd",
+                    "createMethods": [ "Auto" ],
+                    "interfaces": [ "vocsensor", "temperaturesensor", "humiditysensor", "wirelessconnectable", "battery" ],
+                    "paramTypes": [
+                        {
+                            "id": "1d5b406b-7213-481c-bfa3-8071ad5f79a3",
+                            "name": "ieeeAddress",
+                            "displayName": "IEEE adress",
+                            "type": "QString",
+                            "defaultValue": "00:00:00:00:00:00:00:00"
+                        },
+                        {
+                            "id": "ffe73e09-e20b-4eca-951d-b48e52993884",
+                            "name": "networkUuid",
+                            "displayName": "Zigbee network UUID",
+                            "type": "QString",
+                            "defaultValue": ""
+                        }
+                    ],
+                    "settingsTypes": [
+                        {
+                            "id": "5000160b-bb77-46f2-83df-647829a099ca",
+                            "name": "displayUnits",
+                            "displayName": "Display units",
+                            "type": "QString",
+                            "allowedValues": [
+                                "mg/m³ - °C",
+                                "ppb - °C",
+                                "mg/m³ - °F",
+                                "ppb³ - °F"
+                            ],
+                            "defaultValue": "mg/m³ - °C"
+                        }
+                    ],
+                    "stateTypes": [
+                        {
+                            "id": "92f74c82-5a3e-4bb7-b3f3-205a6a19620f",
+                            "name": "connected",
+                            "displayName": "Available",
+                            "type": "bool",
+                            "cached": false,
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "f948308d-ed05-47fb-a893-f1c855db10af",
+                            "name": "signalStrength",
+                            "displayName": "Signal strength",
+                            "defaultValue": 0,
+                            "maxValue": 100,
+                            "minValue": 0,
+                            "type": "uint",
+                            "unit": "Percentage"
+                        },
+                        {
+                            "id": "42e7712d-ff8b-4af5-be33-e4a55527a0b1",
+                            "name": "version",
+                            "displayName": "Version",
+                            "type": "QString",
+                            "cached": true,
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "7ce4b747-dfc2-40db-ba55-fa430de97416",
+                            "name": "temperature",
+                            "displayName": "Temperature",
+                            "type": "double",
+                            "unit": "DegreeCelsius",
+                            "defaultValue": 0.0
+                        },
+                        {
+                            "id": "85bd3b3f-11b7-409f-95bd-f5b5edc95158",
+                            "name": "humidity",
+                            "displayName": "Humidity",
+                            "maxValue": 100,
+                            "minValue": 0,
+                            "unit": "Percentage",
+                            "type": "double",
+                            "defaultValue": 0.0
+                        },
+                        {
+                            "id": "028b0c34-db30-4a3a-bfad-f146b1a96b35",
+                            "name": "voc",
+                            "displayName": "VOC",
+                            "maxValue": 65353,
+                            "minValue": 0,
+                            "unit": "PartsPerBillion",
+                            "type": "uint",
+                            "defaultValue": 0
+                        },
+                        {
+                            "id": "0689e60d-8022-4537-9284-53d7cd91a78b",
+                            "name": "batteryCritical",
+                            "displayName": "Battery leve critical",
+                            "type": "bool",
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "0e143e89-d021-40af-a349-de219ceb2084",
+                            "name": "batteryLevel",
+                            "displayName": "Battery level",
+                            "type": "int",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "defaultValue": 0,
+                            "unit": "Percentage"
+                        }
+                    ]
+                },
+                {
                     "name": "lumiWeatherSensor",
                     "displayName": "Weather sensor",
                     "id": "0b582616-0b05-4ac9-8b59-51b66079b571",

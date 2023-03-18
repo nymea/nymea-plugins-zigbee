@@ -428,7 +428,7 @@ void ZigbeeIntegrationPlugin::configureTemperatureMeasurementInputClusterAttribu
     measuredValueReportingConfig.dataType = Zigbee::Int16;
     measuredValueReportingConfig.minReportingInterval = 5;
     measuredValueReportingConfig.maxReportingInterval = 1200;
-    measuredValueReportingConfig.reportableChange = ZigbeeDataType(static_cast<qint16>(10)).data();
+    measuredValueReportingConfig.reportableChange = ZigbeeDataType(static_cast<qint16>(1)).data();
 
     ZigbeeClusterReply *reportingReply = temperatureMeasurementCluster->configureReporting({measuredValueReportingConfig});
     connect(reportingReply, &ZigbeeClusterReply::finished, this, [=](){
@@ -446,19 +446,40 @@ void ZigbeeIntegrationPlugin::configureRelativeHumidityMeasurementInputClusterAt
         return;
     }
 
-    relativeHumidityMeasurementCluster->readAttributes({ZigbeeClusterRelativeHumidityMeasurement::AttributeMeasuredValue});
-
     ZigbeeClusterLibrary::AttributeReportingConfiguration measuredValueReportingConfig;
     measuredValueReportingConfig.attributeId = ZigbeeClusterRelativeHumidityMeasurement::AttributeMeasuredValue;
     measuredValueReportingConfig.dataType = Zigbee::Int16;
-    measuredValueReportingConfig.minReportingInterval = 60; // We want currentPower asap
+    measuredValueReportingConfig.minReportingInterval = 60;
     measuredValueReportingConfig.maxReportingInterval = 1200;
-    measuredValueReportingConfig.reportableChange = ZigbeeDataType(static_cast<quint8>(1)).data();
+    measuredValueReportingConfig.reportableChange = ZigbeeDataType(static_cast<quint16>(1)).data();
 
     ZigbeeClusterReply *reportingReply = relativeHumidityMeasurementCluster->configureReporting({measuredValueReportingConfig});
     connect(reportingReply, &ZigbeeClusterReply::finished, this, [=](){
         if (reportingReply->error() != ZigbeeClusterReply::ErrorNoError) {
             qCWarning(m_dc) << "Failed to configure temperature measurement cluster attribute reporting" << reportingReply->error();
+        }
+    });
+}
+
+void ZigbeeIntegrationPlugin::configureAnalogInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint)
+{
+    ZigbeeClusterAnalogInput* analogInputCluster = endpoint->inputCluster<ZigbeeClusterAnalogInput>(ZigbeeClusterLibrary::ClusterIdAnalogInput);
+    if (!analogInputCluster) {
+        qCWarning(m_dc) << "No analog input cluster on this endpoint";
+        return;
+    }
+
+    ZigbeeClusterLibrary::AttributeReportingConfiguration config;
+    config.attributeId = ZigbeeClusterAnalogInput::AttributePresentValue;
+    config.minReportingInterval = 30;
+    config.maxReportingInterval = 1200;
+    config.dataType = Zigbee::FloatSingle;
+    config.reportableChange = ZigbeeDataType(static_cast<quint16>(1)).data();
+
+    ZigbeeClusterReply *reportingReply = analogInputCluster->configureReporting({config});
+    connect(reportingReply, &ZigbeeClusterReply::finished, this, [=](){
+        if (reportingReply->error() != ZigbeeClusterReply::ErrorNoError) {
+            qCWarning(m_dc) << "Failed to configure analog input cluster attribute reporting" << reportingReply->error();
         }
     });
 }
