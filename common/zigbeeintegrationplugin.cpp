@@ -686,7 +686,7 @@ void ZigbeeIntegrationPlugin::connectToOnOffOutputCluster(Thing *thing, ZigbeeNo
         qCWarning(m_dc) << "Could not find on/off output cluster on" << thing << endpoint;
     } else {
         connect(onOffCluster, &ZigbeeClusterOnOff::commandReceived, thing, [=](ZigbeeClusterOnOff::Command command, const QByteArray &/*payload*/, quint8 /*transactionSequenceNumber*/){
-            qCDebug(m_dc) << thing << "button pressed" << command;
+            qCDebug(m_dc) << thing << "On/off command received" << command << "on endpoint" << endpoint->endpointId();
             EventType eventType = thing->thingClass().eventTypes().findByName("pressed");
             ParamType buttonNameParamType = eventType.paramTypes().findByName("buttonName");
             if (command == ZigbeeClusterOnOff::CommandOn) {
@@ -721,45 +721,45 @@ void ZigbeeIntegrationPlugin::connectToLevelControlInputCluster(Thing *thing, Zi
     });
 }
 
-void ZigbeeIntegrationPlugin::connectToLevelControlOutputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint)
+void ZigbeeIntegrationPlugin::connectToLevelControlOutputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, const QString &buttonUp, const QString &buttonDown)
 {
     ZigbeeClusterLevelControl *levelCluster = endpoint->outputCluster<ZigbeeClusterLevelControl>(ZigbeeClusterLibrary::ClusterIdLevelControl);
     if (!levelCluster) {
         qCWarning(m_dc) << "Could not find level control output cluster on" << thing << "EP" << endpoint->endpointId();
     } else {
         connect(levelCluster, &ZigbeeClusterLevelControl::commandReceived, thing, [=](ZigbeeClusterLevelControl::Command command, const QByteArray &parameter, quint8 transactionSequenceNumber){
-            qCDebug(m_dc) << "Level control command received" << command << parameter << transactionSequenceNumber;
+            qCDebug(m_dc) << "Level control command received" << command << parameter << transactionSequenceNumber << "on endpoint" << endpoint->endpointId();
         });
 
         connect(levelCluster, &ZigbeeClusterLevelControl::commandMoveReceived, thing, [=](bool withOnOff, ZigbeeClusterLevelControl::MoveMode moveMode, quint8 rate, quint8 transactionSeqenceNumber){
-            qCDebug(m_dc) << thing << "move command received" << withOnOff << moveMode << rate << transactionSeqenceNumber;
+            qCDebug(m_dc) << thing << "move command received" << withOnOff << moveMode << rate << transactionSeqenceNumber << "on endpoint" << endpoint->endpointId();
             EventType eventType = thing->thingClass().eventTypes().findByName("pressed");
             ParamType buttonNameParamType = eventType.paramTypes().findByName("buttonName");
             switch (moveMode) {
             case ZigbeeClusterLevelControl::MoveModeUp:
                 qCDebug(m_dc) << thing << "Move up pressed";
-                emit emitEvent(Event(eventType.id(), thing->id(), ParamList() << Param(buttonNameParamType.id(), "UP")));
+                emit emitEvent(Event(eventType.id(), thing->id(), ParamList() << Param(buttonNameParamType.id(), buttonUp)));
                 break;
             case ZigbeeClusterLevelControl::MoveModeDown:
                 qCDebug(m_dc) << thing << "Move down pressed";
-                emit emitEvent(Event(eventType.id(), thing->id(), ParamList() << Param(buttonNameParamType.id(), "DOWN")));
+                emit emitEvent(Event(eventType.id(), thing->id(), ParamList() << Param(buttonNameParamType.id(), buttonDown)));
                 break;
             default:
                 break;
             }
         });
         connect(levelCluster, &ZigbeeClusterLevelControl::commandStepReceived, thing, [=](bool withOnOff, ZigbeeClusterLevelControl::StepMode stepMode, quint8 stepSize, quint16 transitionTime, quint8 transactionSequenceNumber){
-            qCDebug(m_dc) << thing << "move command received" << withOnOff << stepMode << stepSize << transitionTime << transactionSequenceNumber;
+            qCDebug(m_dc) << thing << "move command received" << withOnOff << stepMode << stepSize << transitionTime << transactionSequenceNumber << "on endpoint" << endpoint->endpointId();
             EventType eventType = thing->thingClass().eventTypes().findByName("pressed");
             ParamType buttonNameParamType = eventType.paramTypes().findByName("buttonName");
             switch (stepMode) {
             case ZigbeeClusterLevelControl::StepModeUp:
                 qCDebug(m_dc) << thing << "Step up pressed";
-                emit emitEvent(Event(eventType.id(), thing->id(), ParamList() << Param(buttonNameParamType.id(), "UP")));
+                emit emitEvent(Event(eventType.id(), thing->id(), ParamList() << Param(buttonNameParamType.id(), buttonUp)));
                 break;
             case ZigbeeClusterLevelControl::StepModeDown:
                 qCDebug(m_dc) << thing << "Step down pressed";
-                emit emitEvent(Event(eventType.id(), thing->id(), ParamList() << Param(buttonNameParamType.id(), "DOWN")));
+                emit emitEvent(Event(eventType.id(), thing->id(), ParamList() << Param(buttonNameParamType.id(), buttonDown)));
                 break;
             default:
                 break;
