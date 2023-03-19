@@ -230,6 +230,7 @@ bool IntegrationPluginZigbeeGeneric::handleNode(ZigbeeNode *node, const QUuid &/
                 qCInfo(dcZigbeeGeneric()) << "H/T sensor device found!";
                 createThing(htSensorThingClassId, node, endpoint->endpointId());
                 bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdRelativeHumidityMeasurement);
+                configureRelativeHumidityMeasurementInputClusterAttributeReporting(endpoint);
             } else {
                 qCInfo(dcZigbeeGeneric()) << "Temperature sensor device found!";
                 createThing(temperatureSensorThingClassId, node, endpoint->endpointId());
