@@ -92,6 +92,7 @@ protected:
     void configureOccupancySensingInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
     void configureFanControlInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
     void configureIasZoneInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
+    void configureWindowCoveringInputClusterLiftPercentageAttributeReporting(ZigbeeNodeEndpoint *endpoint);
 
     void connectToPowerConfigurationInputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, qreal maxVoltage = 0, qreal minVoltage = 0);
     void connectToThermostatCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint);
@@ -110,6 +111,7 @@ protected:
     void connectToFanControlInputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint);
     void connectToOtaOutputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint);
     void connectToAnalogInputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, const QString &stateName);
+    void connectToWindowCoveringInputClusterLiftPercentage(Thing *thing, ZigbeeNodeEndpoint *endpoint);
 
     void executePowerOnOffInputCluster(ThingActionInfo *info, ZigbeeNodeEndpoint *endpoint);
     void executeBrightnessLevelControlInputCluster(ThingActionInfo *info, ZigbeeNodeEndpoint *endpoint);
@@ -119,6 +121,9 @@ protected:
     void executePowerFanControlInputCluster(ThingActionInfo *info, ZigbeeNodeEndpoint *endpoint);
     void executeFlowRateFanControlInputCluster(ThingActionInfo *info, ZigbeeNodeEndpoint *endpoint);
     void executeImageNotifyOtaOutputCluster(ThingActionInfo *info, ZigbeeNodeEndpoint *endpoint);
+    void executeOpenWindowCoveringCluster(ThingActionInfo *info, ZigbeeNodeEndpoint *endpoint);
+    void executeCloseWindowCoveringCluster(ThingActionInfo *info, ZigbeeNodeEndpoint *endpoint);
+    void executeStopWindowCoveringCluster(ThingActionInfo *info, ZigbeeNodeEndpoint *endpoint);
 
     void readColorTemperatureRange(Thing *thing, ZigbeeNodeEndpoint *endpoint);
     quint16 mapScaledValueToColorTemperature(Thing *thing, int scaledColorTemperature);

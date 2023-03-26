@@ -181,6 +181,15 @@ bool IntegrationPluginZigbeeTradfri::handleNode(ZigbeeNode *node, const QUuid &/
         return true;
     }
 
+    if (endpoint->modelIdentifier() == "FYRTUR block-out roller blind") {
+        qCDebug(dcZigbeeTradfri()) << "Handling FYRTUR block-out roller blind" << node << endpoint;
+        createThing(fyrturThingClassId, node);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
+        configurePowerConfigurationInputClusterAttributeReporting(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdWindowCovering);
+        configureWindowCoveringInputClusterLiftPercentageAttributeReporting(endpoint);
+    }
+
     if (endpoint->profile() == Zigbee::ZigbeeProfileHomeAutomation && endpoint->deviceId() == Zigbee::HomeAutomationDeviceRangeExtender) {
         qCDebug(dcZigbeeTradfri()) << "Handling TRADFRI signal repeater" << node << endpoint;
         createThing(signalRepeaterThingClassId, node);
@@ -546,8 +555,14 @@ void IntegrationPluginZigbeeTradfri::setupThing(ThingSetupInfo *info)
                 }
             });
         }
-
     }
+
+    if (thing->thingClassId() == fyrturThingClassId) {
+        ZigbeeNodeEndpoint *endpoint = node->getEndpoint(1);
+        connectToPowerConfigurationInputCluster(thing, endpoint);
+        connectToWindowCoveringInputClusterLiftPercentage(thing, endpoint);
+    }
+
     if (thing->thingClassId() == signalRepeaterThingClassId) {
         connectToOtaOutputCluster(thing, endpoint);
     }
@@ -640,6 +655,21 @@ void IntegrationPluginZigbeeTradfri::executeAction(ThingActionInfo *info)
     if (actionType.name() == "performUpdate") {
         enableFirmwareUpdate(info->thing());
         executeImageNotifyOtaOutputCluster(info, endpoint);
+        return;
+    }
+
+    if (actionType.name() == "open") {
+        executeOpenWindowCoveringCluster(info, endpoint);
+        return;
+    }
+
+    if (actionType.name() == "close") {
+        executeCloseWindowCoveringCluster(info, endpoint);
+        return;
+    }
+
+    if (actionType.name() == "stop") {
+        executeStopWindowCoveringCluster(info, endpoint);
         return;
     }
 

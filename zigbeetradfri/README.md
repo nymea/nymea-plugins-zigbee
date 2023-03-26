@@ -13,7 +13,8 @@ This plugin allows to interact with IKEA TRÅDFRI ZigBee devices using a native 
 * [Motion sensor](https://www.ikea.com/us/en/p/tradfri-wireless-motion-sensor-white-60377655/)
 * [Signal repeater](https://www.ikea.com/us/en/p/tradfri-signal-repeater-30400407/) -**DISCONTINUED**
 * [Control outlet](https://www.ikea.com/us/en/p/tradfri-wireless-control-outlet-30356169/)
-* [Starkvind air purifier](https://www.ikea.com/de/de/new/neu-starkvind-luftreiniger-pub4c72a520), [USA English page](https://www.ikea.com/us/en/p/starkvind-air-purifier-black-smart-40501967/)
+* [Starkvind air purifier](https://www.ikea.com/us/en/p/starkvind-air-purifier-black-smart-40501967/)
+* [Fyrtur block-out roller blind](https://www.ikea.com/us/en/p/fyrtur-black-out-roller-blind-smart-wireless-battery-operated-gray-50417459/)
  
 (*) Known working device firmware version: `2.2.008`
 (**) Known working device firmware version: `2.3.014`

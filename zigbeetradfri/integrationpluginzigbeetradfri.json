@@ -1294,6 +1294,128 @@
                             "displayName": "Perform update"
                         }
                     ]
+                },
+                {
+                    "id": "0d2286dd-23aa-4fba-b905-c833f0c7d486",
+                    "name": "fyrtur",
+                    "displayName": "FYRTUR block-out roller blind",
+                    "setupMethod": "JustAdd",
+                    "createMethods": [ "Auto" ],
+                    "interfaces": [ "extendedblind", "wirelessconnectable", "update" ],
+                    "paramTypes": [
+                        {
+                            "id": "bc3337a2-2871-4c2d-b837-deee2e325ee0",
+                            "name": "ieeeAddress",
+                            "displayName": "IEEE adress",
+                            "type": "QString",
+                            "defaultValue": "00:00:00:00:00:00:00:00"
+                        },
+                        {
+                            "id": "7db137bb-d617-47d9-a6d5-df9683e54f54",
+                            "name": "networkUuid",
+                            "displayName": "Zigbee network UUID",
+                            "type": "QString",
+                            "defaultValue": ""
+                        }
+                    ],
+                    "stateTypes": [
+                        {
+                            "id": "c44b7fb4-d87b-4fd0-b4c6-5131f3156751",
+                            "name": "connected",
+                            "displayName": "Connected",
+                            "displayNameEvent": "Connected changed",
+                            "type": "bool",
+                            "cached": false,
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "af6e5985-c185-4fe0-a976-a41f7040f4f4",
+                            "name": "signalStrength",
+                            "displayName": "Signal strength",
+                            "displayNameEvent": "Signal strength changed",
+                            "defaultValue": 0,
+                            "maxValue": 100,
+                            "minValue": 0,
+                            "type": "uint",
+                            "unit": "Percentage"
+                        },
+                        {
+                            "id": "01ade6d2-f778-49e9-8585-3bc8e8391364",
+                            "name": "moving",
+                            "displayName": "Moving",
+                            "type": "bool",
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "51e6dd8a-769f-4096-8839-ad691ee85424",
+                            "name": "percentage",
+                            "displayName": "Percentage",
+                            "displayNameAction": "Set percentage",
+                            "type": "int",
+                            "unit": "Percentage",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "writable": true,
+                            "defaultValue": 0
+                        },
+                        {
+                            "id": "da474607-f49c-4a07-9310-33d93e890647",
+                            "name": "currentVersion",
+                            "displayName": "Version",
+                            "displayNameEvent": "Version changed",
+                            "type": "QString",
+                            "cached": true,
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "04bd682b-e1b9-491b-b771-22ba44ddc703",
+                            "name": "updateStatus",
+                            "displayName": "Update status",
+                            "type": "QString",
+                            "possibleValues": ["idle", "available", "updating"],
+                            "defaultValue": "idle",
+                            "cached": false
+                        },
+                        {
+                            "id": "bca2f9c8-5bd9-4c8b-a57d-92dda2c10bc5",
+                            "name": "availableVersion",
+                            "displayName": "Available version",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "eeae6626-d53d-42ad-99e2-6f04bd8770b2",
+                            "name": "updateProgress",
+                            "displayName": "Update progress",
+                            "type": "uint",
+                            "unit": "Percentage",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "defaultValue": 0
+                        }
+                    ],
+                    "actionTypes": [
+                        {
+                            "id": "9c4074bc-fc91-42da-acba-003ad4bf9db6",
+                            "name": "open",
+                            "displayName": "Open"
+                        },
+                        {
+                            "id": "9bf470ff-8afa-4595-969d-fddf458d266f",
+                            "name": "close",
+                            "displayName": "Close"
+                        },
+                        {
+                            "id": "03a0253f-a2b7-412a-933e-f55028e310ab",
+                            "name": "stop",
+                            "displayName": "Stop"
+                        },
+                        {
+                            "id": "c2f10178-976e-4eba-b191-202bfc0bf95b",
+                            "name": "performUpdate",
+                            "displayName": "Perform update"
+                        }
+                    ]
                 }
             ]
         }
