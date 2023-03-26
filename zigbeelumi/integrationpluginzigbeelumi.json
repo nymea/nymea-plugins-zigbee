@@ -95,7 +95,7 @@
                     "id": "1a9fb2ea-543e-46b2-a10d-9a977232367b",
                     "setupMethod": "JustAdd",
                     "createMethods": [ "Auto" ],
-                    "interfaces": [ "vocsensor", "temperaturesensor", "humiditysensor", "wirelessconnectable", "battery" ],
+                    "interfaces": [ "vocsensor", "temperaturesensor", "humiditysensor", "wirelessconnectable", "update", "battery" ],
                     "paramTypes": [
                         {
                             "id": "1d5b406b-7213-481c-bfa3-8071ad5f79a3",
@@ -198,6 +198,47 @@
                             "maxValue": 100,
                             "defaultValue": 0,
                             "unit": "Percentage"
+                        },
+                        {
+                            "id": "2c77e659-c1a0-4cfa-b9de-0a131e491ab6",
+                            "name": "currentVersion",
+                            "displayName": "Version",
+                            "type": "QString",
+                            "cached": true,
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "7affb09a-6df6-4fb7-88df-a3785b7aa0b5",
+                            "name": "updateStatus",
+                            "displayName": "Update status",
+                            "type": "QString",
+                            "possibleValues": ["idle", "available", "updating"],
+                            "defaultValue": "idle",
+                            "cached": false
+                        },
+                        {
+                            "id": "799bd935-be61-453f-8e24-a89546e4213d",
+                            "name": "availableVersion",
+                            "displayName": "Available version",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "a6b7f2e2-3d7b-431f-91d8-72f0d47522dd",
+                            "name": "updateProgress",
+                            "displayName": "Update progress",
+                            "type": "uint",
+                            "unit": "Percentage",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "defaultValue": 0
+                        }
+                    ],
+                    "actionTypes": [
+                        {
+                            "id": "208a06cd-bbe5-4eb7-afb0-149d257b19b0",
+                            "name": "performUpdate",
+                            "displayName": "Start update"
                         }
                     ]
                 },

@@ -48,6 +48,7 @@
 #include <zcl/measurement/zigbeeclusterrelativehumiditymeasurement.h>
 #include <zcl/measurement/zigbeeclusterpressuremeasurement.h>
 #include <zcl/security/zigbeeclusteriaszone.h>
+#include <zcl/general/zigbeeclusterpowerconfiguration.h>
 
 #include <QDebug>
 #include <QDataStream>
@@ -329,6 +330,35 @@ void IntegrationPluginZigbeeLumi::setupThing(ThingSetupInfo *info)
         connectToTemperatureMeasurementInputCluster(thing, endpoint);
         connectToRelativeHumidityMeasurementInputCluster(thing, endpoint);
         connectToAnalogInputCluster(thing, endpoint, "voc");
+        connectToOtaOutputCluster(thing, endpoint);
+
+        // FIXME: For testing
+        ZigbeeClusterPowerConfiguration *powerCluster = endpoint->inputCluster<ZigbeeClusterPowerConfiguration>(ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
+        if (powerCluster) {
+            connect(powerCluster, &ZigbeeClusterPowerConfiguration::attributeChanged, thing, [=](const ZigbeeClusterAttribute &attribute){
+                qCDebug(dcZigbeeLumi()) << "***" << thing->name() << "Power configuration cluster attribute changed:" << attribute;
+            });
+
+            if (endpoint->node()->reachable()) {
+                powerCluster->readAttributes({
+                                                 ZigbeeClusterPowerConfiguration::AttributeBatteryPercentageRemaining,
+                                                 ZigbeeClusterPowerConfiguration::AttributeBatteryVoltage,
+                                                 ZigbeeClusterPowerConfiguration::AttributeBatteryAlarmState
+                                             });
+            }
+            connect(endpoint->node(), &ZigbeeNode::reachableChanged, powerCluster, [powerCluster](bool reachable){
+                if (reachable) {
+                    powerCluster->readAttributes({
+                                                     ZigbeeClusterPowerConfiguration::AttributeBatteryPercentageRemaining,
+                                                     ZigbeeClusterPowerConfiguration::AttributeBatteryVoltage,
+                                                     ZigbeeClusterPowerConfiguration::AttributeBatteryAlarmState
+                                                 });
+                }
+            });
+        }
+
+
+
 
         QHash<QString, uint> map = {
             {"mg/m³ - °C", 0x00},
@@ -730,5 +760,13 @@ void IntegrationPluginZigbeeLumi::executeAction(ThingActionInfo *info)
         }
     }
 
+    if (thing->thingClassId() == lumiAirMonitorThingClassId) {
+        if (info->action().actionTypeId() == lumiAirMonitorPerformUpdateActionTypeId) {
+            enableFirmwareUpdate(info->thing());
+            executeImageNotifyOtaOutputCluster(info, node->getEndpoint(1));
+            return;
+        }
+
+    }
     info->finish(Thing::ThingErrorUnsupportedFeature);
 }
