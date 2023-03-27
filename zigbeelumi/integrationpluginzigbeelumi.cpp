@@ -332,6 +332,29 @@ void IntegrationPluginZigbeeLumi::setupThing(ThingSetupInfo *info)
         connectToAnalogInputCluster(thing, endpoint, "voc");
         connectToOtaOutputCluster(thing, endpoint);
 
+        // Device may add clusters delayed in which case the above connects fail
+        connect(endpoint, &ZigbeeNodeEndpoint::inputClusterAdded, thing, [this, thing, endpoint](ZigbeeCluster *cluster) {
+            switch (cluster->clusterId()) {
+            case ZigbeeClusterLibrary::ClusterIdPowerConfiguration:
+                connectToPowerConfigurationInputCluster(thing, endpoint, 3, 2.85);
+                break;
+            case ZigbeeClusterLibrary::ClusterIdTemperatureMeasurement:
+                connectToTemperatureMeasurementInputCluster(thing, endpoint);
+                break;
+            case ZigbeeClusterLibrary::ClusterIdRelativeHumidityMeasurement:
+                connectToRelativeHumidityMeasurementInputCluster(thing, endpoint);
+                break;
+            case ZigbeeClusterLibrary::ClusterIdAnalogInput:
+                connectToAnalogInputCluster(thing, endpoint, "voc");
+                break;
+            case ZigbeeClusterLibrary::ClusterIdOtaUpgrade:
+                connectToOtaOutputCluster(thing, endpoint);
+                break;
+            default:
+                qCWarning(dcZigbeeLumi()) << "Unhandled cluster" << cluster->clusterId() << "appeared on" << thing;
+            }
+        });
+
         // FIXME: For testing
         ZigbeeClusterPowerConfiguration *powerCluster = endpoint->inputCluster<ZigbeeClusterPowerConfiguration>(ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
         if (powerCluster) {
