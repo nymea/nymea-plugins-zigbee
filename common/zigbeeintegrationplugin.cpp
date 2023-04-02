@@ -352,6 +352,8 @@ void ZigbeeIntegrationPlugin::configureElectricalMeasurementInputClusterAttribut
     }
     electricalMeasurementCluster->readFormatting();
 
+    qCDebug(m_dc) << "Configuring attribute reporting for Electrical Measurement input cluster on" << endpoint->endpointId();
+
     ZigbeeClusterLibrary::AttributeReportingConfiguration acTotalPowerConfig;
     acTotalPowerConfig.attributeId = ZigbeeClusterElectricalMeasurement::AttributeACPhaseAMeasurementActivePower;
     acTotalPowerConfig.dataType = Zigbee::Int16;
@@ -378,7 +380,7 @@ void ZigbeeIntegrationPlugin::configureElectricalMeasurementInputClusterAttribut
         if (reportingReply->error() != ZigbeeClusterReply::ErrorNoError) {
             qCWarning(m_dc) << "Failed to configure electrical measurement cluster attribute reporting" << reportingReply->error();
         } else {
-            qCDebug(m_dc) << "Enabled attribute reporting successfully";
+            qCDebug(m_dc) << "Attribute reporting enabled successfully for electrical measurement cluster";
         }
     });
 }
@@ -392,24 +394,28 @@ void ZigbeeIntegrationPlugin::configureMeteringInputClusterAttributeReporting(Zi
     }
     meteringCluster->readFormatting();
 
+    qCDebug(m_dc) << "Configuring attribute reporting for Metering input cluster on" << endpoint->endpointId();
+
     ZigbeeClusterLibrary::AttributeReportingConfiguration instantaneousDemandConfig;
     instantaneousDemandConfig.attributeId = ZigbeeClusterMetering::AttributeInstantaneousDemand;
     instantaneousDemandConfig.dataType = Zigbee::Int24;
     instantaneousDemandConfig.minReportingInterval = 1; // We want currentPower asap
     instantaneousDemandConfig.maxReportingInterval = 120;
-    instantaneousDemandConfig.reportableChange = ZigbeeDataType(static_cast<quint8>(1)).data();
+    instantaneousDemandConfig.reportableChange = ZigbeeDataType(1, Zigbee::Int24).data();
 
     ZigbeeClusterLibrary::AttributeReportingConfiguration currentSummationConfig;
     currentSummationConfig.attributeId = ZigbeeClusterMetering::AttributeCurrentSummationDelivered;
     currentSummationConfig.dataType = Zigbee::Uint48;
     currentSummationConfig.minReportingInterval = 5;
     currentSummationConfig.maxReportingInterval = 120;
-    currentSummationConfig.reportableChange = ZigbeeDataType(static_cast<quint8>(1)).data();
+    currentSummationConfig.reportableChange = ZigbeeDataType(1, Zigbee::Uint48).data();
 
     ZigbeeClusterReply *reportingReply = meteringCluster->configureReporting({instantaneousDemandConfig, currentSummationConfig});
     connect(reportingReply, &ZigbeeClusterReply::finished, this, [=](){
         if (reportingReply->error() != ZigbeeClusterReply::ErrorNoError) {
             qCWarning(m_dc) << "Failed to configure metering cluster attribute reporting" << reportingReply->error();
+        } else {
+            qCDebug(m_dc) << "Attribute reporting enabled successfully for metering cluster";
         }
     });
 
