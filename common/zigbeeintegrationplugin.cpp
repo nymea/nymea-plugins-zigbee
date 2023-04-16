@@ -1098,6 +1098,7 @@ void ZigbeeIntegrationPlugin::connectToOtaOutputCluster(Thing *thing, ZigbeeNode
     connect(otaCluster, &ZigbeeClusterOta::imageBlockRequestReceived, thing, [this, thing, otaCluster](quint8 transactionSequenceNumber, quint16 manufacturerCode, quint16 imageType, quint32 fileVersion, quint32 fileOffset, quint8 maximumDataSize, const ZigbeeAddress &requestNodeAddress, quint16 minimumBlockPeriod){
         Q_UNUSED(requestNodeAddress)
         Q_UNUSED(minimumBlockPeriod)
+        qCDebug(m_dc) << "Image block request received from" << thing->name() << "TSN:" << transactionSequenceNumber << "NamufacturerCode:" << manufacturerCode << "FileVersion:" << fileVersion << "Offset:" << fileOffset << "MaxSize:" << maximumDataSize;
         if (!m_enabledFirmwareUpdates.contains(thing)) {
             // If nymea restarted during the process, or the upgrade process has been cancelled in some other way, let's cancel the OTA.
             qCDebug(m_dc) << "Device requested an image block but update is not enabled for" << thing->name();
