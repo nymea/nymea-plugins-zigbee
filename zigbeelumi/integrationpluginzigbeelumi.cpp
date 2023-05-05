@@ -48,6 +48,7 @@
 #include <zcl/measurement/zigbeeclusterrelativehumiditymeasurement.h>
 #include <zcl/measurement/zigbeeclusterpressuremeasurement.h>
 #include <zcl/security/zigbeeclusteriaszone.h>
+#include <zcl/general/zigbeeclusterpowerconfiguration.h>
 
 #include <QDebug>
 #include <QDataStream>
@@ -60,7 +61,6 @@ IntegrationPluginZigbeeLumi::IntegrationPluginZigbeeLumi():
 {
 
     // Known model identifier
-    m_knownLumiDevices.insert("lumi.sensor_ht", lumiHTSensorThingClassId);
     m_knownLumiDevices.insert("lumi.sensor_magnet", lumiMagnetSensorThingClassId);
     m_knownLumiDevices.insert("lumi.sensor_switch", lumiButtonSensorThingClassId);
     // Check sensor_motion separate since the have the same name but different features
@@ -113,6 +113,24 @@ bool IntegrationPluginZigbeeLumi::handleNode(ZigbeeNode *node, const QUuid &/*ne
 
             bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdMetering);
             configureMeteringInputClusterAttributeReporting(endpoint);
+
+        } else if (endpoint->modelIdentifier() == "lumi.sensor_ht" || endpoint->modelIdentifier() == "lumi.sens") {
+            thingClassId = lumiHTSensorThingClassId;
+
+        } else if (endpoint->modelIdentifier() == "lumi.airmonitor.acn01") {
+            thingClassId = lumiAirMonitorThingClassId;
+
+            bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
+            configurePowerConfigurationInputClusterAttributeReporting(endpoint);
+
+            bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdTemperatureMeasurement);
+            configureTemperatureMeasurementInputClusterAttributeReporting(endpoint);
+
+            bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdRelativeHumidityMeasurement);
+            configureRelativeHumidityMeasurementInputClusterAttributeReporting(endpoint);
+
+            bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdAnalogInput);
+            configureAnalogInputClusterAttributeReporting(endpoint);
 
 
         } else {
@@ -305,6 +323,97 @@ void IntegrationPluginZigbeeLumi::setupThing(ThingSetupInfo *info)
     if (thing->thingClassId() == lumiHTSensorThingClassId) {
         connectToTemperatureMeasurementInputCluster(thing, endpoint);
         connectToRelativeHumidityMeasurementInputCluster(thing, endpoint);
+    }
+
+    if (thing->thingClassId() == lumiAirMonitorThingClassId) {
+        connectToPowerConfigurationInputCluster(thing, endpoint, 3, 2.85);
+        connectToTemperatureMeasurementInputCluster(thing, endpoint);
+        connectToRelativeHumidityMeasurementInputCluster(thing, endpoint);
+        connectToAnalogInputCluster(thing, endpoint, "voc");
+        connectToOtaOutputCluster(thing, endpoint);
+
+        // Device may add clusters delayed in which case the above connects fail
+        connect(endpoint, &ZigbeeNodeEndpoint::inputClusterAdded, thing, [this, thing, endpoint](ZigbeeCluster *cluster) {
+            switch (cluster->clusterId()) {
+            case ZigbeeClusterLibrary::ClusterIdPowerConfiguration:
+                connectToPowerConfigurationInputCluster(thing, endpoint, 3, 2.85);
+                break;
+            case ZigbeeClusterLibrary::ClusterIdTemperatureMeasurement:
+                connectToTemperatureMeasurementInputCluster(thing, endpoint);
+                break;
+            case ZigbeeClusterLibrary::ClusterIdRelativeHumidityMeasurement:
+                connectToRelativeHumidityMeasurementInputCluster(thing, endpoint);
+                break;
+            case ZigbeeClusterLibrary::ClusterIdAnalogInput:
+                connectToAnalogInputCluster(thing, endpoint, "voc");
+                break;
+            case ZigbeeClusterLibrary::ClusterIdOtaUpgrade:
+                connectToOtaOutputCluster(thing, endpoint);
+                break;
+            default:
+                qCWarning(dcZigbeeLumi()) << "Unhandled cluster" << cluster->clusterId() << "appeared on" << thing;
+            }
+        });
+
+        // FIXME: For testing
+        ZigbeeClusterPowerConfiguration *powerCluster = endpoint->inputCluster<ZigbeeClusterPowerConfiguration>(ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
+        if (powerCluster) {
+            connect(powerCluster, &ZigbeeClusterPowerConfiguration::attributeChanged, thing, [=](const ZigbeeClusterAttribute &attribute){
+                qCDebug(dcZigbeeLumi()) << "***" << thing->name() << "Power configuration cluster attribute changed:" << attribute;
+            });
+
+            if (endpoint->node()->reachable()) {
+                powerCluster->readAttributes({
+                                                 ZigbeeClusterPowerConfiguration::AttributeBatteryPercentageRemaining,
+                                                 ZigbeeClusterPowerConfiguration::AttributeBatteryVoltage,
+                                                 ZigbeeClusterPowerConfiguration::AttributeBatteryAlarmState
+                                             });
+            }
+            connect(endpoint->node(), &ZigbeeNode::reachableChanged, powerCluster, [powerCluster](bool reachable){
+                if (reachable) {
+                    powerCluster->readAttributes({
+                                                     ZigbeeClusterPowerConfiguration::AttributeBatteryPercentageRemaining,
+                                                     ZigbeeClusterPowerConfiguration::AttributeBatteryVoltage,
+                                                     ZigbeeClusterPowerConfiguration::AttributeBatteryAlarmState
+                                                 });
+                }
+            });
+        }
+
+
+
+
+        QHash<QString, uint> map = {
+            {"mg/m³ - °C", 0x00},
+            {"ppb - °C", 0x01},
+            {"mg/m³ - °F",0x10},
+            {"ppb³ - °F", 0x11}
+        };
+        ZigbeeCluster *lumiCluster = endpoint->getInputCluster(static_cast<ZigbeeClusterLibrary::ClusterId>(LUMI_CLUSTER_ID));
+        if (lumiCluster) {
+            connect(lumiCluster, &ZigbeeCluster::attributeChanged, thing, [thing, map](const ZigbeeClusterAttribute &attribute){
+                switch (attribute.id()) {
+                case 0x0114: {
+                    quint8 displayUnit = attribute.dataType().toUInt8();
+                    qCDebug(dcZigbeeLumi()) << thing << "Display unit" << displayUnit;
+                    thing->setSettingValue(lumiAirMonitorSettingsDisplayUnitsParamTypeId, map.key(displayUnit));
+                    break;
+                }
+                default:
+                    qCDebug(dcZigbeeLumi()) << thing << "Unhandled attribute report:" << attribute;
+                }
+            });
+            connect(thing, &Thing::settingChanged, lumiCluster, [lumiCluster, map](const ParamTypeId &settingId, const QVariant &value){
+                if (settingId == lumiAirMonitorSettingsDisplayUnitsParamTypeId) {
+                    ZigbeeClusterLibrary::WriteAttributeRecord record;
+                    record.attributeId = 0x0114;
+                    record.dataType = Zigbee::Uint8;
+                    record.data = ZigbeeDataType(map.value(value.toString()), Zigbee::Uint8).data();
+                    lumiCluster->writeAttributes({record}, MANUFACTURER_CODE_XIAOMI);
+                }
+            });
+            lumiCluster->readAttributes({0x0114}, MANUFACTURER_CODE_XIAOMI);
+        }
     }
 
     if (thing->thingClassId() == lumiWeatherSensorThingClassId) {
@@ -668,5 +777,13 @@ void IntegrationPluginZigbeeLumi::executeAction(ThingActionInfo *info)
         }
     }
 
+    if (thing->thingClassId() == lumiAirMonitorThingClassId) {
+        if (info->action().actionTypeId() == lumiAirMonitorPerformUpdateActionTypeId) {
+            enableFirmwareUpdate(info->thing());
+            executeImageNotifyOtaOutputCluster(info, node->getEndpoint(1));
+            return;
+        }
+
+    }
     info->finish(Thing::ThingErrorUnsupportedFeature);
 }
