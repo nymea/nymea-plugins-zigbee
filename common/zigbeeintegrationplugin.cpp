@@ -50,6 +50,7 @@
 #include <zcl/general/zigbeeclusteridentify.h>
 #include <zcl/measurement/zigbeeclusteroccupancysensing.h>
 #include <zcl/ota/zigbeeclusterota.h>
+#include <zcl/closures/zigbeeclusterwindowcovering.h>
 
 #include <QColor>
 #include <QNetworkRequest>
@@ -574,6 +575,26 @@ void ZigbeeIntegrationPlugin::configureIasZoneInputClusterAttributeReporting(Zig
             qCWarning(m_dc) << "Failed to configure IAS Zone cluster status attribute reporting" << reportingReply->error();
         } else {
             qCDebug(m_dc) << "Attribute reporting configuration finished for IAS Zone cluster" << ZigbeeClusterLibrary::parseAttributeReportingStatusRecords(reportingReply->responseFrame().payload);
+        }
+    });
+}
+
+void ZigbeeIntegrationPlugin::configureWindowCoveringInputClusterLiftPercentageAttributeReporting(ZigbeeNodeEndpoint *endpoint)
+{
+    ZigbeeClusterLibrary::AttributeReportingConfiguration reportingStatusConfig;
+    reportingStatusConfig.attributeId = ZigbeeClusterWindowCovering::AttributeCurrentPositionLiftPercentage;
+    reportingStatusConfig.dataType = Zigbee::Uint8;
+    reportingStatusConfig.minReportingInterval = 1;
+    reportingStatusConfig.maxReportingInterval = 2700;
+    reportingStatusConfig.reportableChange = ZigbeeDataType(static_cast<quint8>(1)).data();
+
+    qCDebug(m_dc) << "Configuring attribute reporting for Window Covering lift percentage";
+    ZigbeeClusterReply *reportingReply = endpoint->getInputCluster(ZigbeeClusterLibrary::ClusterIdWindowCovering)->configureReporting({reportingStatusConfig});
+    connect(reportingReply, &ZigbeeClusterReply::finished, this, [=](){
+        if (reportingReply->error() != ZigbeeClusterReply::ErrorNoError) {
+            qCWarning(m_dc) << "Failed to configure Window Covering cluster lift percentage attribute reporting" << reportingReply->error();
+        } else {
+            qCDebug(m_dc) << "Attribute reporting configuration finished for Window Covering cluster lift percentage" << ZigbeeClusterLibrary::parseAttributeReportingStatusRecords(reportingReply->responseFrame().payload);
         }
     });
 }
@@ -1211,6 +1232,39 @@ void ZigbeeIntegrationPlugin::connectToAnalogInputCluster(Thing *thing, ZigbeeNo
     });
 }
 
+void ZigbeeIntegrationPlugin::connectToWindowCoveringInputClusterLiftPercentage(Thing *thing, ZigbeeNodeEndpoint *endpoint)
+{
+    ZigbeeClusterWindowCovering *windowCoveringCluster = endpoint->inputCluster<ZigbeeClusterWindowCovering>(ZigbeeClusterLibrary::ClusterIdWindowCovering);
+    if (!windowCoveringCluster) {
+        qCWarning(m_dc) << "Window Covering cluster not found on" << thing;
+        return;
+    }
+
+    thing->setStateValue("percentage", windowCoveringCluster->currentLiftPercentage());
+
+    QTimer *movingTimer = new QTimer(thing);
+    movingTimer->setInterval(2000); // Attribute reporting for lift percentage is configured to 1 sec
+    movingTimer->setSingleShot(true);
+    connect(movingTimer, &QTimer::timeout, thing, [thing](){
+        thing->setStateValue("moving", false);
+    });
+
+    connect(windowCoveringCluster, &ZigbeeClusterWindowCovering::currentLiftPercentageChanged, thing, [thing, movingTimer](quint8 currentLiftPercentage){
+        thing->setStateValue("percentage", currentLiftPercentage);
+        thing->setStateValue("moving", true);
+        movingTimer->start();
+    });
+
+    if (endpoint->node()->reachable()) {
+        windowCoveringCluster->readAttributes({ZigbeeClusterWindowCovering::AttributeCurrentPositionLiftPercentage});
+    }
+    connect(endpoint->node(), &ZigbeeNode::reachableChanged, [windowCoveringCluster](bool reachable) {
+        if (reachable) {
+            windowCoveringCluster->readAttributes({ZigbeeClusterWindowCovering::AttributeCurrentPositionLiftPercentage});
+        }
+    });
+}
+
 void ZigbeeIntegrationPlugin::executePowerOnOffInputCluster(ThingActionInfo *info, ZigbeeNodeEndpoint *endpoint)
 {
     ZigbeeClusterOnOff *onOffCluster = endpoint->inputCluster<ZigbeeClusterOnOff>(ZigbeeClusterLibrary::ClusterIdOnOff);
@@ -1374,6 +1428,63 @@ void ZigbeeIntegrationPlugin::executeImageNotifyOtaOutputCluster(ThingActionInfo
 
     otaCluster->sendImageNotify(); // imageNotify has no default response flag set. So don't wait for a confirmation
     info->finish(Thing::ThingErrorNoError);
+}
+
+void ZigbeeIntegrationPlugin::executeOpenWindowCoveringCluster(ThingActionInfo *info, ZigbeeNodeEndpoint *endpoint)
+{
+    ZigbeeClusterWindowCovering *windowCoveringCluster = endpoint->inputCluster<ZigbeeClusterWindowCovering>(ZigbeeClusterLibrary::ClusterIdWindowCovering);
+    if (!windowCoveringCluster) {
+        qCWarning(m_dc) << "Could not find Window Covering cluster for" << info->thing()->name();
+        info->finish(Thing::ThingErrorHardwareFailure);
+        return;
+    }
+
+    ZigbeeClusterReply *reply = windowCoveringCluster->open();
+    connect(reply, &ZigbeeClusterReply::finished, info, [this, reply, info](){
+        if (reply->error() != ZigbeeClusterReply::ErrorNoError) {
+            ActionType actionType = info->thing()->thingClass().actionTypes().findById(info->action().actionTypeId());
+            qCWarning(m_dc) << "Error executing action:" << actionType.name();
+        }
+        info->finish(reply->error() == ZigbeeClusterReply::ErrorNoError ? Thing::ThingErrorNoError : Thing::ThingErrorHardwareFailure);
+    });
+}
+
+void ZigbeeIntegrationPlugin::executeCloseWindowCoveringCluster(ThingActionInfo *info, ZigbeeNodeEndpoint *endpoint)
+{
+    ZigbeeClusterWindowCovering *windowCoveringCluster = endpoint->inputCluster<ZigbeeClusterWindowCovering>(ZigbeeClusterLibrary::ClusterIdWindowCovering);
+    if (!windowCoveringCluster) {
+        qCWarning(m_dc) << "Could not find Window Covering cluster for" << info->thing()->name();
+        info->finish(Thing::ThingErrorHardwareFailure);
+        return;
+    }
+
+    ZigbeeClusterReply *reply = windowCoveringCluster->close();
+    connect(reply, &ZigbeeClusterReply::finished, info, [this, reply, info](){
+        if (reply->error() != ZigbeeClusterReply::ErrorNoError) {
+            ActionType actionType = info->thing()->thingClass().actionTypes().findById(info->action().actionTypeId());
+            qCWarning(m_dc) << "Error executing action:" << actionType.name();
+        }
+        info->finish(reply->error() == ZigbeeClusterReply::ErrorNoError ? Thing::ThingErrorNoError : Thing::ThingErrorHardwareFailure);
+    });
+}
+
+void ZigbeeIntegrationPlugin::executeStopWindowCoveringCluster(ThingActionInfo *info, ZigbeeNodeEndpoint *endpoint)
+{
+    ZigbeeClusterWindowCovering *windowCoveringCluster = endpoint->inputCluster<ZigbeeClusterWindowCovering>(ZigbeeClusterLibrary::ClusterIdWindowCovering);
+    if (!windowCoveringCluster) {
+        qCWarning(m_dc) << "Could not find Window Covering cluster for" << info->thing()->name();
+        info->finish(Thing::ThingErrorHardwareFailure);
+        return;
+    }
+
+    ZigbeeClusterReply *reply = windowCoveringCluster->stop();
+    connect(reply, &ZigbeeClusterReply::finished, info, [this, reply, info](){
+        if (reply->error() != ZigbeeClusterReply::ErrorNoError) {
+            ActionType actionType = info->thing()->thingClass().actionTypes().findById(info->action().actionTypeId());
+            qCWarning(m_dc) << "Error executing action:" << actionType.name();
+        }
+        info->finish(reply->error() == ZigbeeClusterReply::ErrorNoError ? Thing::ThingErrorNoError : Thing::ThingErrorHardwareFailure);
+    });
 }
 
 void ZigbeeIntegrationPlugin::readColorTemperatureRange(Thing *thing, ZigbeeNodeEndpoint *endpoint)
