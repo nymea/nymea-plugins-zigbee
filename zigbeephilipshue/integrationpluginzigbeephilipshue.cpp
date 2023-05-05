@@ -111,7 +111,7 @@ bool IntegrationPluginZigbeePhilipsHue::handleNode(ZigbeeNode *node, const QUuid
 
             qCDebug(dcZigbeePhilipsHue()) << "Handling Hue dimmer switch" << node << endpointOne << endpointTwo;
             createThing(dimmerSwitchThingClassId, node);
-            bindPowerConfigurationCluster(endpointTwo);
+            bindCluster(endpointTwo, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
             configurePowerConfigurationInputClusterAttributeReporting(endpointTwo);
             bindManufacturerSpecificPhilipsCluster(endpointTwo);
             return true;
@@ -126,13 +126,13 @@ bool IntegrationPluginZigbeePhilipsHue::handleNode(ZigbeeNode *node, const QUuid
             qCDebug(dcZigbeePhilipsHue()) << "Handling Hue motion sensor" << node << endpointOne << endpointTwo;
 
             createThing(motionSensorThingClassId, node);
-            bindPowerConfigurationCluster(endpointTwo);
+            bindCluster(endpointTwo, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
             configurePowerConfigurationInputClusterAttributeReporting(endpointTwo);
-            bindOccupancySensingCluster(endpointTwo);
+            bindCluster(endpointTwo, ZigbeeClusterLibrary::ClusterIdOccupancySensing);
             configureOccupancySensingInputClusterAttributeReporting(endpointTwo);
-            bindTemperatureMeasurementCluster(endpointTwo);
+            bindCluster(endpointTwo, ZigbeeClusterLibrary::ClusterIdTemperatureMeasurement);
             configureTemperatureMeasurementInputClusterAttributeReporting(endpointTwo);
-            bindIlluminanceMeasurementCluster(endpointTwo);
+            bindCluster(endpointTwo, ZigbeeClusterLibrary::ClusterIdIlluminanceMeasurement);
             configureIlluminanceMeasurementInputClusterAttributeReporting(endpointTwo);
             return true;
         }
@@ -143,7 +143,7 @@ bool IntegrationPluginZigbeePhilipsHue::handleNode(ZigbeeNode *node, const QUuid
 
         if (endpointOne->modelIdentifier() == "RWL022") {
             createThing(dimmerSwitch2ThingClassId, node);
-            bindPowerConfigurationCluster(endpointOne);
+            bindCluster(endpointOne, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
             configurePowerConfigurationInputClusterAttributeReporting(endpointOne);
             bindManufacturerSpecificPhilipsCluster(endpointOne);
             return true;
@@ -154,10 +154,10 @@ bool IntegrationPluginZigbeePhilipsHue::handleNode(ZigbeeNode *node, const QUuid
                 endpointOne->deviceId() == Zigbee::HomeAutomationDeviceNonColourSceneController) {
             qCDebug(dcZigbeePhilipsHue()) << "Handling Hue Smart button" << node << endpointOne;
             createThing(smartButtonThingClassId, node);
-            bindPowerConfigurationCluster(endpointOne);
+            bindCluster(endpointOne, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
             configurePowerConfigurationInputClusterAttributeReporting(endpointOne);
-            bindOnOffCluster(endpointOne);
-            bindLevelControlCluster(endpointOne);
+            bindCluster(endpointOne, ZigbeeClusterLibrary::ClusterIdOnOff);
+            bindCluster(endpointOne, ZigbeeClusterLibrary::ClusterIdLevelControl);
             return true;
         }
 
@@ -166,10 +166,10 @@ bool IntegrationPluginZigbeePhilipsHue::handleNode(ZigbeeNode *node, const QUuid
                 endpointOne->deviceId() == Zigbee::HomeAutomationDeviceNonColourController) {
             createThing(wallSwitchModuleThingClassId, node);
             bindManufacturerSpecificPhilipsCluster(endpointOne);
-            bindPowerConfigurationCluster(endpointOne);
+            bindCluster(endpointOne, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
             configurePowerConfigurationInputClusterAttributeReporting(endpointOne);
-            bindOnOffCluster(endpointOne);
-            bindLevelControlCluster(endpointOne);
+            bindCluster(endpointOne, ZigbeeClusterLibrary::ClusterIdOnOff);
+            bindCluster(endpointOne, ZigbeeClusterLibrary::ClusterIdLevelControl);
             return true;
         }
     }
