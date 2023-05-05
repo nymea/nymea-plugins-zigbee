@@ -109,6 +109,15 @@ Description: nymea integration plugin for ZigBee based Tuya devices
  Tuya and rebranded as various products.
 
 
+Package: nymea-plugin-zigbee-schneiderelectric
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Description: nymea integration plugin for ZigBee based Schneider Electric devices
+ This package contains the nymea integration plugin for ZigBee based devices by
+ Schneider Electric.
+
+
 Package: nymea-plugins-zigbee
 Section: libs    
 Architecture: all
@@ -121,5 +130,6 @@ Depends: nymea-plugin-zigbee-develco,
          nymea-plugin-zigbee-philipshue,
          nymea-plugin-zigbee-tradfri,
          nymea-plugin-zigbee-tuya,
+         nymea-plugin-zigbee-schneiderelectric,
 Description: ZigBee integration plugins for nymea - meta package
  This package will install all ZigBee related integration plugins for nymea.

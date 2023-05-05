@@ -98,7 +98,7 @@ protected:
     void connectToOnOffInputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, const QString &stateName = "power");
     void connectToOnOffOutputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, const QString &onButtonName = "ON", const QString &offButtonName = "OFF", const QString &toggleButtonName = "TOGGLE");
     void connectToLevelControlInputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, const QString &stateName);
-    void connectToLevelControlOutputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint);
+    void connectToLevelControlOutputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, const QString &buttonUp = "UP", const QString &buttonDown = "DOWN");
     void connectToColorControlInputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint);
     void connectToElectricalMeasurementCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint);
     void connectToMeteringCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint);

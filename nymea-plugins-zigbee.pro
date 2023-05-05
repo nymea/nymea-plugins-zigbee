@@ -1,16 +1,17 @@
 TEMPLATE = subdirs
 
 PLUGIN_DIRS = \
-    zigbeedevelco       \
-    zigbeeeurotronic    \
-    zigbeegeneric       \
-    zigbeegewiss        \
-    zigbeejung          \
-    zigbeelumi          \
-    zigbeeosram         \
-    zigbeephilipshue    \
-    zigbeetradfri       \
-    zigbeetuya          \
+    zigbeedevelco           \
+    zigbeeeurotronic        \
+    zigbeegeneric           \
+    zigbeegewiss            \
+    zigbeejung              \
+    zigbeelumi              \
+    zigbeeosram             \
+    zigbeephilipshue        \
+    zigbeeschneiderelectric \
+    zigbeetradfri           \
+    zigbeetuya              \
 
 
 message(============================================)

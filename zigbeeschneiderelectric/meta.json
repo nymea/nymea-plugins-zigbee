@@ -1,0 +1,12 @@
+{
+    "title": "ZigBee SchneiderElectric",
+    "tagline": "Support for SchneiderElectric ZigBee devices.",
+    "icon": "schneiderelectric.png",
+    "stability": "consumer",
+    "offline": true,
+    "technologies": [
+        "zigbee"
+    ],
+    "categories": [
+    ]
+}

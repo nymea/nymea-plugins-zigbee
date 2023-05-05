@@ -1,0 +1,100 @@
+{
+    "name": "ZigbeeSchneiderElectric",
+    "displayName": "ZigBee Schneider Electric",
+    "id": "01f285a6-f927-4648-a4eb-4f2124f9d490",
+    "vendors": [
+        {
+            "name": "schneiderElectric",
+            "displayName": "Schneider Electric",
+            "id": "1bd48b2d-1e84-4f9a-aeb0-7f564655a548",
+            "thingClasses": [
+                {
+                    "name": "flsAirlink4",
+                    "displayName": "FLS/AIRLINK/4",
+                    "id": "38693f57-004b-4d0b-aea3-df1ba7ca244e",
+                    "setupMethod": "JustAdd",
+                    "createMethods": [ "Auto" ],
+                    "interfaces": [ "button", "wirelessconnectable", "battery" ],
+                    "paramTypes": [
+                        {
+                            "id": "387d2dcb-5a6b-4596-bb66-6ffccac3e3c8",
+                            "name": "ieeeAddress",
+                            "displayName": "IEEE adress",
+                            "type": "QString",
+                            "defaultValue": "00:00:00:00:00:00:00:00"
+                        },
+                        {
+                            "id": "db901fe4-fba9-4db5-b98b-7f5ec1b4564e",
+                            "name": "networkUuid",
+                            "displayName": "Zigbee network UUID",
+                            "type": "QString",
+                            "defaultValue": ""
+                        }
+                    ],
+                    "stateTypes": [
+                        {
+                            "id": "07cf64a6-f0b4-4c7b-ac26-9388900e6cdc",
+                            "name": "connected",
+                            "displayName": "Available",
+                            "type": "bool",
+                            "cached": false,
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "40313883-bb05-40a6-b98e-6d31f89352db",
+                            "name": "signalStrength",
+                            "displayName": "Signal strength",
+                            "defaultValue": 0,
+                            "maxValue": 100,
+                            "minValue": 0,
+                            "type": "uint",
+                            "unit": "Percentage"
+                        },
+                        {
+                            "id": "21b3af55-a149-4844-94f2-49f7f63336c4",
+                            "name": "batteryLevel",
+                            "displayName": "Battery level",
+                            "type": "int",
+                            "unit": "Percentage",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "defaultValue": 100
+                        },
+                        {
+                            "id": "352e2b5b-e9d9-4df5-a482-c771966bb0f5",
+                            "name": "batteryCritical",
+                            "displayName": "Battery level critical",
+                            "type": "bool",
+                            "defaultValue": false
+                        }
+                    ],
+                    "eventTypes": [
+                        {
+                            "id": "e1d2fc49-def3-4a8f-b81e-6c4000e3124b",
+                            "name": "pressed",
+                            "displayName": "Button pressed",
+                            "paramTypes": [
+                                {
+                                    "id": "8ec191ee-ed56-47ee-872d-6bd3d02bd7c9",
+                                    "name": "buttonName",
+                                    "displayName": "Button name",
+                                    "type": "QString",
+                                    "allowedValues": [
+                                        "Top on",
+                                        "Top off",
+                                        "Top up",
+                                        "Top down",
+                                        "Bottom on",
+                                        "Bottom off",
+                                        "Bottom up",
+                                        "Bottom down"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
