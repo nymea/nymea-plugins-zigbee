@@ -186,6 +186,16 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
     ZigbeeNode *node = nodeForThing(thing);
     ZigbeeNodeEndpoint *endpoint = node->getEndpoint(0x01);
 
+    connect(node, &ZigbeeNode::lastSeenChanged, this, [this](){
+        while (!m_delayedDpWrites.isEmpty()) {
+            DelayedDpWrite op = m_delayedDpWrites.takeFirst();
+            ZigbeeClusterReply *reply = op.cluster->executeClusterCommand(COMMAND_ID_DATA_REQUEST, op.dp.toData(), ZigbeeClusterLibrary::DirectionClientToServer, true);
+            connect(reply, &ZigbeeClusterReply::finished, reply, [=](){
+                qCDebug(dcZigbeeTuya()) << "DP written with status" << reply->error();
+            });
+        }
+    });
+
     if (thing->thingClassId() == powerSocketThingClassId) {
         connectToOnOffInputCluster(thing, endpoint);
         connectToElectricalMeasurementCluster(thing, endpoint);
@@ -318,10 +328,7 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
                 dp = DpValue(PRESENCE_SENSOR_DP_FADING_TIME, DpValue::TypeUInt32, value.toUInt() * 10, 4, m_seq++);
             }
             qCDebug(dcZigbeeTuya()) << "setting" << thing->thingClass().settingsTypes().findById(settingTypeId).name() << dp << dp.toData().toHex();
-            ZigbeeClusterReply *reply = cluster->executeClusterCommand(COMMAND_ID_DATA_REQUEST, dp.toData(), ZigbeeClusterLibrary::DirectionClientToServer, true);
-            connect(reply, &ZigbeeClusterReply::finished, reply, [=](){
-                qCDebug(dcZigbeeTuya()) << "setting set with status" << reply->error();
-            });
+            writeDpDelayed(cluster, dp);
         });
     }
 
@@ -345,14 +352,14 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
         connect(iasZoneCluster, &ZigbeeClusterIasZone::attributeChanged, thing, [thing](const ZigbeeClusterAttribute &attribute){
             thing->setSettingValue(vibrationSensorSettingsSensitivityParamTypeId, attribute.dataType().toUInt8());
         });
-        connect(thing, &Thing::settingChanged, iasZoneCluster, [iasZoneCluster](const ParamTypeId &settingId, const QVariant &value){
+        connect(thing, &Thing::settingChanged, iasZoneCluster, [this, iasZoneCluster](const ParamTypeId &settingId, const QVariant &value){
             Q_UNUSED(settingId)
             ZigbeeDataType dataType(static_cast<quint8>(value.toUInt()));
             ZigbeeClusterLibrary::WriteAttributeRecord sensitivityAttribute;
             sensitivityAttribute.attributeId = ZigbeeClusterIasZone::AttributeCurrentZoneSensitivityLevel;
             sensitivityAttribute.dataType = dataType.dataType();
             sensitivityAttribute.data = dataType.data();
-            iasZoneCluster->writeAttributes({sensitivityAttribute});
+            writeAttributesDelayed(iasZoneCluster, {sensitivityAttribute});
         });
 
         connect(iasZoneCluster, &ZigbeeClusterIasZone::zoneStatusChanged, thing, [=](ZigbeeClusterIasZone::ZoneStatusFlags zoneStatus, quint8 extendedStatus, quint8 zoneId, quint16 delays) {
@@ -430,10 +437,7 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
                 dp = DpValue(LUMINANCE_MOTION_SENSOR_DP_SENSITIVITY, DpValue::TypeEnum, value.toUInt(), 4, m_seq++);
             }
             qCDebug(dcZigbeeTuya()) << "setting" << thing->thingClass().settingsTypes().findById(settingTypeId).name() << dp << dp.toData().toHex();
-            ZigbeeClusterReply *reply = cluster->executeClusterCommand(COMMAND_ID_DATA_REQUEST, dp.toData(), ZigbeeClusterLibrary::DirectionClientToServer, true);
-            connect(reply, &ZigbeeClusterReply::finished, reply, [=](){
-                qCDebug(dcZigbeeTuya()) << "setting set with status" << reply->error();
-            });
+            writeDpDelayed(cluster, dp);
         });
 
     }
@@ -523,7 +527,7 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
                 dp = DpValue(HT_SENSOR_DP_HUMIDITY_CALIBRATION, DpValue::TypeUInt32, value.toUInt(), 4, m_seq++);
             }
             qCDebug(dcZigbeeTuya()) << "setting" << thing->thingClass().settingsTypes().findById(settingTypeId).name() << dp << dp.toData().toHex();
-            cluster->executeClusterCommand(COMMAND_ID_DATA_REQUEST, dp.toData(), ZigbeeClusterLibrary::DirectionClientToServer, true);
+            writeDpDelayed(cluster, dp);
         });
 
     }
@@ -724,5 +728,17 @@ void IntegrationPluginZigbeeTuya::pollEnergyMeters()
 bool IntegrationPluginZigbeeTuya::match(ZigbeeNode *node, const QString &modelName, const QStringList &manufacturerNames)
 {
     return node->modelName() == modelName && manufacturerNames.contains(node->manufacturerName());
+}
+
+void IntegrationPluginZigbeeTuya::writeDpDelayed(ZigbeeCluster *cluster, const DpValue &dp)
+{
+    DelayedDpWrite op;
+    op.cluster = cluster;
+    op.dp = dp;
+    m_delayedDpWrites.append(op);
+
+    // Trigger the delayed write asap by trying to read to trigger a lastSeen change
+    cluster->executeClusterCommand(COMMAND_ID_DATA_QUERY, QByteArray(), ZigbeeClusterLibrary::DirectionClientToServer, true);
+
 }
 

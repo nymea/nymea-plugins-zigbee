@@ -259,14 +259,14 @@ void IntegrationPluginZigbeeLumi::setupThing(ThingSetupInfo *info)
                     qCDebug(dcZigbeeLumi()) << thing << "Unhandled attribute report:" << attribute;
                 }
             });
-            connect(thing, &Thing::settingChanged, lumiCluster, [lumiCluster] (const ParamTypeId &settingTypeId, const QVariant &value){
+            connect(thing, &Thing::settingChanged, lumiCluster, [this, lumiCluster] (const ParamTypeId &settingTypeId, const QVariant &value){
                 if (settingTypeId == lumiMotionSensor2SettingsSensitivityParamTypeId) {
                     ZigbeeDataType dt(value.toUInt(), Zigbee::Uint8);
                     ZigbeeClusterLibrary::WriteAttributeRecord record;
                     record.attributeId = 0x010c;
                     record.dataType = dt.dataType();
                     record.data = dt.data();
-                    lumiCluster->writeAttributes({record}, MANUFACTURER_CODE_XIAOMI);
+                    writeAttributesDelayed(lumiCluster, {record}, MANUFACTURER_CODE_XIAOMI);
                 }
             });
         }
@@ -358,7 +358,7 @@ void IntegrationPluginZigbeeLumi::setupThing(ThingSetupInfo *info)
 
     if (thing->thingClassId() == lumiVibrationSensorThingClassId) {
 
-        connect(thing, &Thing::settingChanged, this, [thing, endpoint](const ParamTypeId &paramTypeId, const QVariant &value){
+        connect(thing, &Thing::settingChanged, this, [this, thing, endpoint](const ParamTypeId &paramTypeId, const QVariant &value){
             qCDebug(dcZigbeeLumi()) << thing->thingClass().displayName() << "settings changed" << thing->thingClass().settingsTypes().findById(paramTypeId).displayName() << value;
             if (paramTypeId == lumiVibrationSensorSettingsSensitivityParamTypeId) {
                 QString sensitivity = value.toString();
@@ -381,13 +381,7 @@ void IntegrationPluginZigbeeLumi::setupThing(ThingSetupInfo *info)
                 record.attributeId = 0xFF0D;
                 record.dataType = Zigbee::Uint8;
                 record.data = QByteArray(1, sensitivityValue);
-                ZigbeeClusterReply *reply = basicCluster->writeAttributes({record}, 0x115f);
-                connect(reply, &ZigbeeClusterReply::finished, thing, [sensitivityValue, sensitivity, reply](){
-                    if (reply->error() != ZigbeeClusterReply::ErrorNoError) {
-                        qCWarning(dcZigbeeLumi()) << "Error setting sensitivity to" << sensitivity << sensitivityValue << reply->error();
-                        return;
-                    }
-                });
+                writeAttributesDelayed(basicCluster, {record}, MANUFACTURER_CODE_XIAOMI);
             }
         });
 

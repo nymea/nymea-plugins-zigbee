@@ -33,6 +33,7 @@
 
 #include "../common/zigbeeintegrationplugin.h"
 #include "extern-plugininfo.h"
+#include "dpvalue.h"
 
 #include <plugintimer.h>
 
@@ -62,9 +63,17 @@ private slots:
 private:
     bool match(ZigbeeNode *node, const QString &modelName, const QStringList &manufacturerNames);
 
+    void writeDpDelayed(ZigbeeCluster *cluster, const DpValue &dp);
+
 private:
+    struct DelayedDpWrite {
+        DpValue dp;
+        ZigbeeCluster *cluster;
+    };
+
     PluginTimer *m_energyPollTimer = nullptr;
     quint16 m_seq = 0;
+    QList<DelayedDpWrite> m_delayedDpWrites;
 };
 
 #endif // INTEGRATIONPLUGINZIGBEETUYA_H
