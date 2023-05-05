@@ -135,7 +135,7 @@ bool IntegrationPluginZigbeeGeneric::handleNode(ZigbeeNode *node, const QUuid &/
                 if (endpoint->hasInputCluster(ZigbeeClusterLibrary::ClusterIdMetering)) {
                     qCDebug(dcZigbeeGeneric()) << "Handling power socket with energy metering for" << node << endpoint;
                     createThing(powerMeterSocketThingClassId, node, endpoint->endpointId());
-                    bindMeteringCluster(endpoint);
+                    bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdMetering);
                     configureMeteringInputClusterAttributeReporting(endpoint);
 
                 } else {

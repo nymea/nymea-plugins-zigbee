@@ -256,32 +256,6 @@ void ZigbeeIntegrationPlugin::bindColorControlCluster(ZigbeeNodeEndpoint *endpoi
     });
 }
 
-void ZigbeeIntegrationPlugin::bindElectricalMeasurementCluster(ZigbeeNodeEndpoint *endpoint)
-{
-    ZigbeeNode *node = endpoint->node();
-    ZigbeeDeviceObjectReply *bindElectricalMeasurementClusterReply = node->deviceObject()->requestBindIeeeAddress(endpoint->endpointId(), ZigbeeClusterLibrary::ClusterIdElectricalMeasurement,hardwareManager()->zigbeeResource()->coordinatorAddress(node->networkUuid()), 0x01);
-    connect(bindElectricalMeasurementClusterReply, &ZigbeeDeviceObjectReply::finished, node, [=](){
-        if (bindElectricalMeasurementClusterReply->error() != ZigbeeDeviceObjectReply::ErrorNoError) {
-            qCWarning(m_dc) << "Failed to bind electrical measurement cluster" << bindElectricalMeasurementClusterReply->error();
-        } else {
-            qCDebug(m_dc) << "Bound electrical measurement cluster successfully";
-        }
-    });
-}
-
-void ZigbeeIntegrationPlugin::bindMeteringCluster(ZigbeeNodeEndpoint *endpoint)
-{
-    ZigbeeNode *node = endpoint->node();
-
-    ZigbeeDeviceObjectReply *bindMeteringClusterReply = node->deviceObject()->requestBindIeeeAddress(endpoint->endpointId(), ZigbeeClusterLibrary::ClusterIdMetering,
-                                                                                           hardwareManager()->zigbeeResource()->coordinatorAddress(node->networkUuid()), 0x01);
-    connect(bindMeteringClusterReply, &ZigbeeDeviceObjectReply::finished, node, [=](){
-        if (bindMeteringClusterReply->error() != ZigbeeDeviceObjectReply::ErrorNoError) {
-            qCWarning(m_dc) << "Failed to bind metering cluster" << bindMeteringClusterReply->error();
-        }
-    });
-}
-
 void ZigbeeIntegrationPlugin::bindTemperatureMeasurementCluster(ZigbeeNodeEndpoint *endpoint, int retries)
 {
     ZigbeeNode *node = endpoint->node();
@@ -532,6 +506,13 @@ void ZigbeeIntegrationPlugin::configureColorControlInputClusterAttributeReportin
 
 void ZigbeeIntegrationPlugin::configureElectricalMeasurementInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint)
 {
+    ZigbeeClusterElectricalMeasurement* electricalMeasurementCluster = endpoint->inputCluster<ZigbeeClusterElectricalMeasurement>(ZigbeeClusterLibrary::ClusterIdElectricalMeasurement);
+    if (!electricalMeasurementCluster) {
+        qCWarning(m_dc) << "No electrical measurement cluster on this endpoint";
+        return;
+    }
+    electricalMeasurementCluster->readFormatting();
+
     ZigbeeClusterLibrary::AttributeReportingConfiguration acTotalPowerConfig;
     acTotalPowerConfig.attributeId = ZigbeeClusterElectricalMeasurement::AttributeACPhaseAMeasurementActivePower;
     acTotalPowerConfig.dataType = Zigbee::Int16;
@@ -553,7 +534,7 @@ void ZigbeeIntegrationPlugin::configureElectricalMeasurementInputClusterAttribut
     rmsCurrentConfig.maxReportingInterval = 120;
     rmsCurrentConfig.reportableChange = ZigbeeDataType(static_cast<quint16>(1)).data();
 
-    ZigbeeClusterReply *reportingReply = endpoint->getInputCluster(ZigbeeClusterLibrary::ClusterIdElectricalMeasurement)->configureReporting({acTotalPowerConfig, rmsVoltageConfig, rmsCurrentConfig});
+    ZigbeeClusterReply *reportingReply = electricalMeasurementCluster->configureReporting({acTotalPowerConfig, rmsVoltageConfig, rmsCurrentConfig});
     connect(reportingReply, &ZigbeeClusterReply::finished, this, [=](){
         if (reportingReply->error() != ZigbeeClusterReply::ErrorNoError) {
             qCWarning(m_dc) << "Failed to configure electrical measurement cluster attribute reporting" << reportingReply->error();
@@ -571,7 +552,6 @@ void ZigbeeIntegrationPlugin::configureMeteringInputClusterAttributeReporting(Zi
         return;
     }
     meteringCluster->readFormatting();
-    meteringCluster->readAttributes({ZigbeeClusterMetering::AttributeInstantaneousDemand, ZigbeeClusterMetering::AttributeCurrentSummationDelivered});
 
     ZigbeeClusterLibrary::AttributeReportingConfiguration instantaneousDemandConfig;
     instantaneousDemandConfig.attributeId = ZigbeeClusterMetering::AttributeInstantaneousDemand;
@@ -967,8 +947,20 @@ void ZigbeeIntegrationPlugin::connectToElectricalMeasurementCluster(Thing *thing
         return;
     }
 
-    connect(electricalMeasurementCluster, &ZigbeeClusterElectricalMeasurement::activePowerPhaseAChanged, thing, [thing](qint16 activePowerPhaseA){
-        thing->setStateValue("currentPower", activePowerPhaseA);
+    connect(electricalMeasurementCluster, &ZigbeeClusterElectricalMeasurement::activePowerPhaseAChanged, thing, [=](qint16 activePowerPhaseA){
+        thing->setStateValue("currentPower", 1.0 * activePowerPhaseA * electricalMeasurementCluster->acPowerMultiplier() / electricalMeasurementCluster->acPowerDivisor());
+    });
+
+    electricalMeasurementCluster->readAttributes({
+                                        ZigbeeClusterElectricalMeasurement::AttributeACPhaseAMeasurementActivePower
+                                    });
+
+    connect(endpoint->node(), &ZigbeeNode::reachableChanged, this, [=](bool reachable){
+        if (reachable) {
+            electricalMeasurementCluster->readAttributes({
+                                                ZigbeeClusterElectricalMeasurement::AttributeACPhaseAMeasurementActivePower
+                                            });
+        }
     });
 }
 
@@ -988,6 +980,20 @@ void ZigbeeIntegrationPlugin::connectToMeteringCluster(Thing *thing, ZigbeeNodeE
 
     connect(meteringCluster, &ZigbeeClusterMetering::instantaneousDemandChanged, thing, [=](qint32 instantaneousDemand){
         thing->setStateValue("currentPower", instantaneousDemand);
+    });
+
+    meteringCluster->readAttributes({
+                                        ZigbeeClusterMetering::AttributeCurrentSummationDelivered,
+                                        ZigbeeClusterMetering::AttributeInstantaneousDemand
+                                    });
+
+    connect(endpoint->node(), &ZigbeeNode::reachableChanged, this, [=](bool reachable){
+        if (reachable) {
+            meteringCluster->readAttributes({
+                                                ZigbeeClusterMetering::AttributeCurrentSummationDelivered,
+                                                ZigbeeClusterMetering::AttributeInstantaneousDemand
+                                            });
+        }
     });
 }
 

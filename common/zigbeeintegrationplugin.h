@@ -81,8 +81,6 @@ protected:
     void bindOnOffCluster(ZigbeeNodeEndpoint *endpoint, int retries = 3);
     void bindLevelControlCluster(ZigbeeNodeEndpoint *endpoint);
     void bindColorControlCluster(ZigbeeNodeEndpoint *endpoint);
-    void bindElectricalMeasurementCluster(ZigbeeNodeEndpoint *endpoint);
-    void bindMeteringCluster(ZigbeeNodeEndpoint *endpoint);
     void bindTemperatureMeasurementCluster(ZigbeeNodeEndpoint *endpoint, int retries = 3);
     void bindRelativeHumidityMeasurementCluster(ZigbeeNodeEndpoint *endpoint, int retries = 3);
     void bindIasZoneCluster(ZigbeeNodeEndpoint *endpoint);
