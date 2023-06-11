@@ -162,12 +162,19 @@ void IntegrationPluginZigbeeLumi::setupThing(ThingSetupInfo *info)
         return;
     }
 
-    ZigbeeNode *node = nodeForThing(thing);
+    info->finish(Thing::ThingErrorNoError);
+}
 
+void IntegrationPluginZigbeeLumi::createConnections(Thing *thing)
+{
+    ZigbeeNode *node = nodeForThing(thing);
+    if (!node) {
+        qCWarning(dcZigbeeLumi()) << "Unable to get ZigBee node for thing" << thing;
+        return;
+    }
     ZigbeeNodeEndpoint *endpoint = node->getEndpoint(0x01);
     if (!endpoint) {
         qCWarning(dcZigbeeLumi()) << "Zigbee endpoint 1 not found on" << thing;
-        info->finish(Thing::ThingErrorSetupFailed);
         return;
     }
 
@@ -717,14 +724,17 @@ void IntegrationPluginZigbeeLumi::setupThing(ThingSetupInfo *info)
             qCWarning(dcZigbeeLumi()) << "Could not find endpoint 2 on" << thing << node;
         }
     }
-
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeeLumi::executeAction(ThingActionInfo *info)
 {
     Thing *thing = info->thing();
     ZigbeeNode *node = nodeForThing(info->thing());
+    if (!node) {
+        qCWarning(dcZigbeeLumi()) << "Node for thing" << thing << "not found.";
+        info->finish(Thing::ThingErrorHardwareNotAvailable, QT_TR_NOOP("ZigBee node not found in network."));
+        return;
+    }
 
     if (thing->thingClassId() == lumiPowerSocketThingClassId) {
         ZigbeeNodeEndpoint *endpoint = node->getEndpoint(0x01);

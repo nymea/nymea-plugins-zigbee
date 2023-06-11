@@ -84,7 +84,16 @@ void IntegrationPluginZigbeeJung::setupThing(ThingSetupInfo *info)
         return;
     }
 
+    info->finish(Thing::ThingErrorNoError);
+}
+
+void IntegrationPluginZigbeeJung::createConnections(Thing *thing)
+{
     ZigbeeNode *node = nodeForThing(thing);
+    if (!node) {
+        qCWarning(dcZigbeeJung()) << "Node for thing" << thing << "not found.";
+        return;
+    }
 
     if (thing->thingClassId() == instaThingClassId) {
         ZigbeeNodeEndpoint *endpoint = node->getEndpoint(0x01);
@@ -94,7 +103,6 @@ void IntegrationPluginZigbeeJung::setupThing(ThingSetupInfo *info)
         ZigbeeClusterScenes *scenesCluster = endpoint->outputCluster<ZigbeeClusterScenes>(ZigbeeClusterLibrary::ClusterIdScenes);
         if (!onOffCluster || !levelControlCluster || !scenesCluster) {
             qCWarning(dcZigbeeJung()) << "Could not find all of the needed clusters for" << thing->name() << "in" << node << "on endpoint" << endpoint->endpointId();
-            info->finish(Thing::ThingErrorHardwareNotAvailable);
             return;
         }
         connect(onOffCluster, &ZigbeeClusterOnOff::commandReceived, this, [=](ZigbeeClusterOnOff::Command command, const QByteArray &parameters){
@@ -132,16 +140,18 @@ void IntegrationPluginZigbeeJung::setupThing(ThingSetupInfo *info)
 
         connectToOtaOutputCluster(thing, endpoint);
 
-        info->finish(Thing::ThingErrorNoError);
         return;
     }
-
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeeJung::executeAction(ThingActionInfo *info)
 {
     ZigbeeNode *node = nodeForThing(info->thing());
+    if (!node) {
+        qCWarning(dcZigbeeJung()) << "Node for thing" << info->thing() << "not found.";
+        info->finish(Thing::ThingErrorHardwareNotAvailable, QT_TR_NOOP("ZigBee node not found in network."));
+        return;
+    }
 
     if (info->action().actionTypeId() == instaPerformUpdateActionTypeId) {
         enableFirmwareUpdate(info->thing());

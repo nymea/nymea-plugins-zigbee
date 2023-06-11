@@ -56,6 +56,8 @@ public:
     void executeAction(ThingActionInfo *info) override;
 
 private:
+    void createConnections(Thing *thing) override;
+
     bool deduplicate(Thing *thing, quint8 transactionSequenceNumber);
     QHash<Thing*, quint8> m_transactionSequenceNumbers;
 

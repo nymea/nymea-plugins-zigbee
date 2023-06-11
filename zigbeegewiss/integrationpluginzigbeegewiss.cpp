@@ -110,8 +110,16 @@ void IntegrationPluginZigbeeGewiss::setupThing(ThingSetupInfo *info)
         return;
     }
 
-    ZigbeeNode *node = nodeForThing(thing);
+    info->finish(Thing::ThingErrorNoError);
+}
 
+void IntegrationPluginZigbeeGewiss::createConnections(Thing *thing)
+{
+    ZigbeeNode *node = nodeForThing(thing);
+    if (!node) {
+        qCWarning(dcZigbeeGewiss()) << "Node for thing" << thing << "not found.";
+        return;
+    }
 
     if (thing->thingClassId() == gwa1501BinaryInputThingClassId) {
 
@@ -127,7 +135,6 @@ void IntegrationPluginZigbeeGewiss::setupThing(ThingSetupInfo *info)
         connectToOnOffOutputCluster(thing, endpoint1, "Toggle 1", "On 1", "Off 1", "input1");
         connectToOnOffOutputCluster(thing, endpoint2, "Toggle 2", "On 2", "Off 2", "input2");
 
-        info->finish(Thing::ThingErrorNoError);
         return;
 
         // Single channel relay
@@ -151,11 +158,7 @@ void IntegrationPluginZigbeeGewiss::setupThing(ThingSetupInfo *info)
                 thing->setStateValue(gwa1521ActuatorRelayStateTypeId, power);
             });
         }
-        return info->finish(Thing::ThingErrorNoError);
     }
-    qCWarning(dcZigbeeGewiss()) << "Thing class not found" << info->thing()->thingClassId();
-    Q_ASSERT_X(false, "ZigbeeGewiss", "Unhandled thing class");
-    return info->finish(Thing::ThingErrorThingClassNotFound);
 }
 
 void IntegrationPluginZigbeeGewiss::executeAction(ThingActionInfo *info)
@@ -168,7 +171,7 @@ void IntegrationPluginZigbeeGewiss::executeAction(ThingActionInfo *info)
 
     Thing *thing = info->thing();
     ZigbeeNode *node = nodeForThing(info->thing());
-    if (!node->reachable()) {
+    if (!node || !node->reachable()) {
         info->finish(Thing::ThingErrorHardwareNotAvailable);
         return;
     }

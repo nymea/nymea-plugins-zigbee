@@ -189,7 +189,17 @@ void IntegrationPluginZigbeePhilipsHue::setupThing(ThingSetupInfo *info)
         return;
     }
 
+    info->finish(Thing::ThingErrorNoError);
+}
+
+void IntegrationPluginZigbeePhilipsHue::createConnections(Thing *thing)
+{
+
     ZigbeeNode *node = nodeForThing(thing);
+    if (!node) {
+        qCWarning(dcZigbeePhilipsHue()) << "Node for thing" << thing << "not found.";
+        return;
+    }
 
 
     if (thing->thingClassId() == dimmableLightThingClassId
@@ -474,13 +484,16 @@ void IntegrationPluginZigbeePhilipsHue::setupThing(ThingSetupInfo *info)
             }
         });
     }
-
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeePhilipsHue::executeAction(ThingActionInfo *info)
 {
     ZigbeeNode *node = nodeForThing(info->thing());
+    if (!node) {
+        qCWarning(dcZigbeePhilipsHue()) << "Node for thing" << info->thing() << "not found.";
+        info->finish(Thing::ThingErrorHardwareNotAvailable, QT_TR_NOOP("ZigBee node not found in network."));
+        return;
+    }
 
     ActionType actionType = info->thing()->thingClass().actionTypes().findById(info->action().actionTypeId());
 

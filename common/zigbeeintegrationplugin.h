@@ -73,7 +73,9 @@ protected:
     Thing *thingForNode(ZigbeeNode *node);
     ZigbeeNode *nodeForThing(Thing *thing);
 
-    virtual void createThing(const ThingClassId &thingClassId, ZigbeeNode *node, const ParamList &additionalParams = ParamList());
+    virtual Thing *createThing(const ThingClassId &thingClassId, ZigbeeNode *node, const ParamList &additionalParams = ParamList());
+    virtual void createConnections(Thing *thing) = 0;
+
 
     void bindCluster(ZigbeeNodeEndpoint *endpoint, ZigbeeClusterLibrary::ClusterId clusterId, int retries = 3);
 
@@ -94,6 +96,7 @@ protected:
     void configureFanControlInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
     void configureIasZoneInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
     void configureWindowCoveringInputClusterLiftPercentageAttributeReporting(ZigbeeNodeEndpoint *endpoint);
+    void configureDoorLockInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint);
 
     void connectToPowerConfigurationInputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, qreal maxVoltage = 0, qreal minVoltage = 0);
     void connectToThermostatCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint);
@@ -145,6 +148,7 @@ private slots:
     virtual void updateFirmwareIndex();
 
 private:
+    void setupNode(ZigbeeNode *node, Thing *thing);
     FirmwareIndexEntry firmwareInfo(quint16 manufacturerId, quint16 imageType, quint32 fileVersion) const;
     QString firmwareFileName(const FirmwareIndexEntry &info) const;
     FetchFirmwareReply *fetchFirmware(const FirmwareIndexEntry &info);

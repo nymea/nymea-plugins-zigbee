@@ -208,12 +208,20 @@ void IntegrationPluginZigbeeTradfri::setupThing(ThingSetupInfo *info)
         return;
     }
 
+    info->finish(Thing::ThingErrorNoError);
+}
+
+void IntegrationPluginZigbeeTradfri::createConnections(Thing *thing)
+{
     ZigbeeNode *node = nodeForThing(thing);
+    if (!node) {
+        qCWarning(dcZigbeeTradfri()) << "Node for thing" << thing << "not found.";
+        return;
+    }
 
     ZigbeeNodeEndpoint *endpoint = node->getEndpoint(1);
     if (!endpoint) {
         qCWarning(dcZigbeeTradfri()) << "Could not find endpoint for" << thing;
-        info->finish(Thing::ThingErrorSetupFailed);
         return;
     }
 
@@ -566,12 +574,16 @@ void IntegrationPluginZigbeeTradfri::setupThing(ThingSetupInfo *info)
     if (thing->thingClassId() == signalRepeaterThingClassId) {
         connectToOtaOutputCluster(thing, endpoint);
     }
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeeTradfri::executeAction(ThingActionInfo *info)
 {
     ZigbeeNode *node = nodeForThing(info->thing());
+    if (!node) {
+        qCWarning(dcZigbeeTradfri()) << "Node for thing" << info->thing() << "not found.";
+        info->finish(Thing::ThingErrorHardwareNotAvailable, QT_TR_NOOP("ZigBee node not found in network."));
+        return;
+    }
 
     ZigbeeNodeEndpoint *endpoint = node->getEndpoint(1);
 

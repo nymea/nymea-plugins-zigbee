@@ -51,6 +51,7 @@
 #include <zcl/measurement/zigbeeclusteroccupancysensing.h>
 #include <zcl/ota/zigbeeclusterota.h>
 #include <zcl/closures/zigbeeclusterwindowcovering.h>
+#include <zcl/closures/zigbeeclusterdoorlock.h>
 
 #include <QColor>
 #include <QNetworkRequest>
@@ -83,10 +84,16 @@ void ZigbeeIntegrationPlugin::handleRemoveNode(ZigbeeNode *node, const QUuid &ne
 {
     Q_UNUSED(networkUuid)
     foreach (Thing *thing, m_thingNodes.keys(node)) {
-        emit autoThingDisappeared(thing->id());
 
-        // Removing it from our map to prevent a loop that would ask the zigbee network to remove this node (see thingRemoved())
-        m_thingNodes.remove(thing);
+        // Not removing thing as this destroys magic too easily if a device decides to leave and rejoin for whatever reason
+        // While in theory that's not a use case, in practice it turns out that this is a common thing to do when fiddling with
+        // ZigBee network instabilites. Instead we're just marking things as disconnected.
+
+//        emit autoThingDisappeared(thing->id());
+//        // Removing it from our map to prevent a loop that would ask the zigbee network to remove this node (see thingRemoved())
+//        m_thingNodes.remove(thing);
+
+        thing->setStateValue("connected", false);
     }
 }
 
@@ -113,39 +120,7 @@ ZigbeeNode* ZigbeeIntegrationPlugin::manageNode(Thing *thing)
         return nullptr;
     }
 
-    m_thingNodes.insert(thing, node);
-
-    // Update connected state
-    thing->setStateValue("connected", node->reachable());
-    connect(node, &ZigbeeNode::reachableChanged, thing, [thing](bool reachable){
-        thing->setStateValue("connected", reachable);
-    });
-
-    // Update signal strength
-    thing->setStateValue("signalStrength", qRound(node->lqi() * 100.0 / 255.0));
-    connect(node, &ZigbeeNode::lqiChanged, thing, [thing](quint8 lqi){
-        uint signalStrength = qRound(lqi * 100.0 / 255.0);
-        thing->setStateValue("signalStrength", signalStrength);
-    });
-
-    connect(node, &ZigbeeNode::lastSeenChanged, this, [=](){
-        while (!m_delayedWriteRequests.value(node).isEmpty()) {
-            DelayedAttributeWriteRequest request = m_delayedWriteRequests[node].takeFirst();
-            ZigbeeClusterReply *reply = request.cluster->writeAttributes(request.records, request.manufacturerCode);
-            connect(reply, &ZigbeeClusterReply::finished, this, [=](){
-                if (reply->error() != ZigbeeClusterReply::ErrorNoError) {
-                    qCWarning(m_dc) << "Error writing attributes on" << thing->name();
-                }
-            });
-        }
-        while (!m_delayedReadRequests.value(node).isEmpty()) {
-            DelayedAttributeReadRequest request = m_delayedReadRequests[node].takeFirst();
-            ZigbeeClusterReply *reply = request.cluster->readAttributes(request.attributes, request.manufacturerCode);
-            if (reply->error() != ZigbeeClusterReply::ErrorNoError) {
-                qCWarning(m_dc) << "Error writing attributes on" << thing->name();
-            }
-        }
-    });
+    setupNode(node, thing);
 
     return node;
 }
@@ -160,7 +135,7 @@ ZigbeeNode *ZigbeeIntegrationPlugin::nodeForThing(Thing *thing)
     return m_thingNodes.value(thing);
 }
 
-void ZigbeeIntegrationPlugin::createThing(const ThingClassId &thingClassId, ZigbeeNode *node, const ParamList &additionalParams)
+Thing *ZigbeeIntegrationPlugin::createThing(const ThingClassId &thingClassId, ZigbeeNode *node, const ParamList &additionalParams)
 {
     ThingDescriptor descriptor(thingClassId);
     QString deviceClassName = supportedThings().findById(thingClassId).displayName();
@@ -172,7 +147,15 @@ void ZigbeeIntegrationPlugin::createThing(const ThingClassId &thingClassId, Zigb
     params.append(Param(tc.paramTypes().findByName("ieeeAddress").id(), node->extendedAddress().toString()));
     params.append(additionalParams);
     descriptor.setParams(params);
-    emit autoThingsAppeared({descriptor});
+
+    Thing *existingThing = myThings().findByParams(params);
+    if (!existingThing) {
+        emit autoThingsAppeared({descriptor});
+    } else {
+        qCInfo(m_dc) << "Thing for node" << node << "already existing. Not recreating.";
+        setupNode(node, existingThing);
+    }
+    return existingThing;
 }
 
 void ZigbeeIntegrationPlugin::bindCluster(ZigbeeNodeEndpoint *endpoint, ZigbeeClusterLibrary::ClusterId clusterId, int retries)
@@ -597,6 +580,27 @@ void ZigbeeIntegrationPlugin::configureWindowCoveringInputClusterLiftPercentageA
             qCDebug(m_dc) << "Attribute reporting configuration finished for Window Covering cluster lift percentage" << ZigbeeClusterLibrary::parseAttributeReportingStatusRecords(reportingReply->responseFrame().payload);
         }
     });
+}
+
+void ZigbeeIntegrationPlugin::configureDoorLockInputClusterAttributeReporting(ZigbeeNodeEndpoint *endpoint)
+{
+    ZigbeeClusterLibrary::AttributeReportingConfiguration reportingConfig;
+    reportingConfig.attributeId = ZigbeeClusterDoorLock::AttributeLockState;
+    reportingConfig.dataType = Zigbee::Enum8;
+    reportingConfig.minReportingInterval = 60;
+    reportingConfig.maxReportingInterval = 120;
+    reportingConfig.reportableChange = ZigbeeDataType(static_cast<quint8>(1)).data();
+
+    qCDebug(m_dc()) << "Configuring attribute reporting for door lock cluster lock state";
+    ZigbeeClusterReply *reportingReply = endpoint->getInputCluster(ZigbeeClusterLibrary::ClusterIdDoorLock)->configureReporting({reportingConfig});
+    connect(reportingReply, &ZigbeeClusterReply::finished, this, [=](){
+        if (reportingReply->error() != ZigbeeClusterReply::ErrorNoError) {
+            qCWarning(m_dc()) << "Failed to door lock cluster door state attribute reporting" << reportingReply->error();
+        } else {
+            qCDebug(m_dc()) << "Attribute reporting configuration finished for door lock cluster lock state" << ZigbeeClusterLibrary::parseAttributeReportingStatusRecords(reportingReply->responseFrame().payload);
+        }
+    });
+
 }
 
 void ZigbeeIntegrationPlugin::connectToPowerConfigurationInputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, qreal maxVoltage, qreal minVoltage)
@@ -1077,6 +1081,10 @@ void ZigbeeIntegrationPlugin::connectToOtaOutputCluster(Thing *thing, ZigbeeNode
         otaCluster->setProperty("lastFirmwareCheck", QDateTime::currentDateTime());
 
         ZigbeeNode *node = nodeForThing(thing);
+        if (!node) {
+            qCWarning(m_dc) << "Node for thing" << thing << "not found. Cannot continue with OTA";
+            return;
+        }
         FirmwareIndexEntry newInfo = checkFirmwareAvailability(m_firmwareIndex, manufacturerCode, imageType, currentFileVersion, node->modelName());
         ZigbeeClusterOta::FileVersion currentParsed = ZigbeeClusterOta::parseFileVersion(currentFileVersion);
         thing->setStateValue("currentVersion", QString("%0.%1.%2.%3")
@@ -1654,6 +1662,48 @@ void ZigbeeIntegrationPlugin::updateFirmwareIndex()
         }
         cache.write(data);
         cache.close();
+    });
+}
+
+void ZigbeeIntegrationPlugin::setupNode(ZigbeeNode *node, Thing *thing)
+{
+    m_thingNodes.insert(thing, node);
+
+    // Delaying the connection setup to only set state values after the thing setup finished
+    QTimer::singleShot(0, thing, [=](){
+        // Update connected state
+        thing->setStateValue("connected", node->reachable());
+        connect(node, &ZigbeeNode::reachableChanged, thing, [thing](bool reachable){
+            thing->setStateValue("connected", reachable);
+        });
+
+        // Update signal strength
+        thing->setStateValue("signalStrength", qRound(node->lqi() * 100.0 / 255.0));
+        connect(node, &ZigbeeNode::lqiChanged, thing, [thing](quint8 lqi){
+            uint signalStrength = qRound(lqi * 100.0 / 255.0);
+            thing->setStateValue("signalStrength", signalStrength);
+        });
+
+        connect(node, &ZigbeeNode::lastSeenChanged, this, [=](){
+            while (!m_delayedWriteRequests.value(node).isEmpty()) {
+                DelayedAttributeWriteRequest request = m_delayedWriteRequests[node].takeFirst();
+                ZigbeeClusterReply *reply = request.cluster->writeAttributes(request.records, request.manufacturerCode);
+                connect(reply, &ZigbeeClusterReply::finished, this, [=](){
+                    if (reply->error() != ZigbeeClusterReply::ErrorNoError) {
+                        qCWarning(m_dc) << "Error writing attributes on" << thing->name();
+                    }
+                });
+            }
+            while (!m_delayedReadRequests.value(node).isEmpty()) {
+                DelayedAttributeReadRequest request = m_delayedReadRequests[node].takeFirst();
+                ZigbeeClusterReply *reply = request.cluster->readAttributes(request.attributes, request.manufacturerCode);
+                if (reply->error() != ZigbeeClusterReply::ErrorNoError) {
+                    qCWarning(m_dc) << "Error writing attributes on" << thing->name();
+                }
+            }
+        });
+
+        createConnections(thing);
     });
 }
 

@@ -51,6 +51,9 @@ public:
     bool handleNode(ZigbeeNode *node, const QUuid &networkUuid) override;
 
     void setupThing(ThingSetupInfo *info) override;
+
+protected:
+    void createConnections(Thing *thing) override;
 };
 
 #endif // INTEGRATIONPLUGINZIGBEESCHNEIDERELECTRIC_H

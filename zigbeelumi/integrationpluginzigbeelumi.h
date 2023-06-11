@@ -57,6 +57,8 @@ public:
     void executeAction(ThingActionInfo *info) override;
 
 private:
+    void createConnections(Thing *thing) override;
+
     QHash<QString, ThingClassId> m_knownLumiDevices;
 
 };

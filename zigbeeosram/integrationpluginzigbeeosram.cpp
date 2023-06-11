@@ -95,6 +95,16 @@ void IntegrationPluginZigbeeOsram::setupThing(ThingSetupInfo *info)
         return;
     }
 
+    info->finish(Thing::ThingErrorNoError);
+}
+
+void IntegrationPluginZigbeeOsram::createConnections(Thing *thing)
+{
+    ZigbeeNode *node = nodeForThing(thing);
+    if (!node) {
+        qCWarning(dcZigbeeOsram()) << "Failed to claim node during setup.";
+        return;
+    }
 
     if (thing->thingClassId() == switchMiniThingClassId) {
         ZigbeeNodeEndpoint *ep1 = node->getEndpoint(1),
@@ -200,10 +210,7 @@ void IntegrationPluginZigbeeOsram::setupThing(ThingSetupInfo *info)
             }
 
         });
-
     }
-
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeeOsram::executeAction(ThingActionInfo *info)

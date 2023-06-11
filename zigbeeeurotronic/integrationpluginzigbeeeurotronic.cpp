@@ -79,7 +79,17 @@ void IntegrationPluginZigbeeEurotronic::setupThing(ThingSetupInfo *info)
         return;
     }
 
+    info->finish(Thing::ThingErrorNoError);
+}
+
+void IntegrationPluginZigbeeEurotronic::createConnections(Thing *thing)
+{
     ZigbeeNode *node = nodeForThing(thing);
+    if (!node) {
+        qCWarning(dcZigbeeEurotronic()) << "Node for thing" << thing << "not found.";
+        return;
+    }
+
     ZigbeeNodeEndpoint *endpoint = node->getEndpoint(0x01);
     thing->setStateValue("currentVersion", endpoint->deviceVersion());
 
@@ -89,7 +99,6 @@ void IntegrationPluginZigbeeEurotronic::setupThing(ThingSetupInfo *info)
     ZigbeeClusterThermostat *thermostatCluster = endpoint->inputCluster<ZigbeeClusterThermostat>(ZigbeeClusterLibrary::ClusterIdThermostat);
     if (!thermostatCluster) {
         qCWarning(dcZigbeeEurotronic()) << "Failed to read thermostat cluster";
-        info->finish(Thing::ThingErrorHardwareFailure);
         return;
     }
 
@@ -107,8 +116,6 @@ void IntegrationPluginZigbeeEurotronic::setupThing(ThingSetupInfo *info)
         }
     });
     thermostatCluster->readAttributes({0x4008}, 0x1037);
-
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeeEurotronic::executeAction(ThingActionInfo *info)
@@ -143,6 +150,11 @@ void IntegrationPluginZigbeeEurotronic::sendNextAction()
     }
 
     ZigbeeNode *node = nodeForThing(info->thing());
+    if (!node) {
+        qCWarning(dcZigbeeEurotronic()) << "Node for thing" << info->thing() << "not found.";
+        info->finish(Thing::ThingErrorHardwareNotAvailable, QT_TR_NOOP("ZigBee node not found in network."));
+        return;
+    }
     ZigbeeNodeEndpoint *endpoint = node->getEndpoint(0x01);
 
     ZigbeeClusterThermostat *thermostatCluster = endpoint->inputCluster<ZigbeeClusterThermostat>(ZigbeeClusterLibrary::ClusterIdThermostat);

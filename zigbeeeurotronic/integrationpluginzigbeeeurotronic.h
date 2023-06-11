@@ -64,6 +64,8 @@ public:
     void executeAction(ThingActionInfo *info) override;
 
 private:
+    void createConnections(Thing *thing) override;
+
     void sendNextAction();
 
 private:

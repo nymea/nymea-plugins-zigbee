@@ -52,10 +52,14 @@ public:
     void setupThing(ThingSetupInfo *info) override;
     void executeAction(ThingActionInfo *info) override;
 
+protected:
+    void createConnections(Thing *thing) override;
+
 private slots:
     void pollLight(Thing *thing);
 
 private:
+
     void bindManufacturerSpecificPhilipsCluster(ZigbeeNodeEndpoint *endpoint);
 
     QHash<Thing*, PluginTimer*> m_pollTimers;
