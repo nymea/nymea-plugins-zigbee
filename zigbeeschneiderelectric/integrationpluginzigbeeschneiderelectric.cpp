@@ -109,13 +109,13 @@ void IntegrationPluginZigbeeSchneiderElectric::setupThing(ThingSetupInfo *info)
             return;
         }
 
+        info->finish(Thing::ThingErrorNoError);
+
         connectToPowerConfigurationInputCluster(thing, endpoint21);
         connectToOnOffOutputCluster(thing, endpoint21, "Top on", "Top on");
         connectToLevelControlOutputCluster(thing, endpoint21, "Top up", "Top down");
         connectToOnOffOutputCluster(thing, endpoint22, "Bottom on", "Bottom off");
         connectToLevelControlOutputCluster(thing, endpoint22, "Bottom up", "Bottom down");
-
-        info->finish(Thing::ThingErrorNoError);
         return;
     }
 

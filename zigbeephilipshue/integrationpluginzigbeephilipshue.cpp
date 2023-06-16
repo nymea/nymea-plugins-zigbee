@@ -192,6 +192,8 @@ void IntegrationPluginZigbeePhilipsHue::setupThing(ThingSetupInfo *info)
     ZigbeeNode *node = nodeForThing(thing);
 
 
+    info->finish(Thing::ThingErrorNoError);
+
     if (thing->thingClassId() == dimmableLightThingClassId
             || thing->thingClassId() == colorTemperatureLightThingClassId
             || thing->thingClassId() == colorLightThingClassId) {
@@ -474,8 +476,6 @@ void IntegrationPluginZigbeePhilipsHue::setupThing(ThingSetupInfo *info)
             }
         });
     }
-
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeePhilipsHue::executeAction(ThingActionInfo *info)

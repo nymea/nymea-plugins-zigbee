@@ -81,17 +81,20 @@ void IntegrationPluginZigbeeEurotronic::setupThing(ThingSetupInfo *info)
 
     ZigbeeNode *node = nodeForThing(thing);
     ZigbeeNodeEndpoint *endpoint = node->getEndpoint(0x01);
-    thing->setStateValue("currentVersion", endpoint->deviceVersion());
-
-    connectToPowerConfigurationInputCluster(thing, endpoint);
-    connectToThermostatCluster(thing, endpoint);
-
     ZigbeeClusterThermostat *thermostatCluster = endpoint->inputCluster<ZigbeeClusterThermostat>(ZigbeeClusterLibrary::ClusterIdThermostat);
     if (!thermostatCluster) {
         qCWarning(dcZigbeeEurotronic()) << "Failed to read thermostat cluster";
         info->finish(Thing::ThingErrorHardwareFailure);
         return;
     }
+
+    info->finish(Thing::ThingErrorNoError);
+
+    thing->setStateValue("currentVersion", endpoint->deviceVersion());
+
+    connectToPowerConfigurationInputCluster(thing, endpoint);
+    connectToThermostatCluster(thing, endpoint);
+
 
     connect(thermostatCluster, &ZigbeeClusterThermostat::attributeChanged, thing, [thing](const ZigbeeClusterAttribute &attribute){
         qCDebug(dcZigbeeEurotronic()) << "Thermostat attribute changed" << thing->name() << attribute.id() << attribute.dataType();
@@ -107,8 +110,6 @@ void IntegrationPluginZigbeeEurotronic::setupThing(ThingSetupInfo *info)
         }
     });
     thermostatCluster->readAttributes({0x4008}, 0x1037);
-
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeeEurotronic::executeAction(ThingActionInfo *info)

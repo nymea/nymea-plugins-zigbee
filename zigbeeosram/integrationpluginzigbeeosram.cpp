@@ -101,6 +101,14 @@ void IntegrationPluginZigbeeOsram::setupThing(ThingSetupInfo *info)
                 *ep2 = node->getEndpoint(2),
                 *ep3 = node->getEndpoint(3);
 
+        if (!ep1 || !ep2 || !ep3) {
+            qCWarning(dcZigbeeOsram()) << "Expected endpoints not found on node" << node;
+            info->finish(Thing::ThingErrorHardwareFailure);
+            return;
+        }
+
+        info->finish(Thing::ThingErrorNoError);
+
         thing->setStateValue("currentVersion", ep1->softwareBuildId());
 
         connectToPowerConfigurationInputCluster(thing, ep1, 3, 2.5);
@@ -200,10 +208,7 @@ void IntegrationPluginZigbeeOsram::setupThing(ThingSetupInfo *info)
             }
 
         });
-
     }
-
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeeOsram::executeAction(ThingActionInfo *info)

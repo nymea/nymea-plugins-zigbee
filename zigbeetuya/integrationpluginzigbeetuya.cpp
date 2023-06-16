@@ -197,6 +197,8 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
     });
 
     if (thing->thingClassId() == powerSocketThingClassId) {
+        info->finish(Thing::ThingErrorNoError);
+
         connectToOnOffInputCluster(thing, endpoint);
         connectToElectricalMeasurementCluster(thing, endpoint);
 
@@ -245,6 +247,13 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
 
     if (thing->thingClassId() == presenceSensorThingClassId) {
         ZigbeeCluster *cluster = node->getEndpoint(0x01)->getInputCluster(static_cast<ZigbeeClusterLibrary::ClusterId>(CLUSTER_ID_MANUFACTURER_SPECIFIC_TUYA));
+        if (!cluster) {
+            qCWarning(dcZigbeeTuya()) << "Unable to find endpoint 1 on node" << node;
+            info->finish(Thing::ThingErrorHardwareFailure);
+            return;
+        }
+        info->finish(Thing::ThingErrorNoError);
+
         cluster->executeClusterCommand(COMMAND_ID_DATA_QUERY, QByteArray(), ZigbeeClusterLibrary::DirectionClientToServer, true);
 
         connect(cluster, &ZigbeeCluster::dataIndication, thing, [thing](const ZigbeeClusterLibrary::Frame &frame){
@@ -341,9 +350,12 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
         }
         ZigbeeClusterIasZone *iasZoneCluster = endpoint->inputCluster<ZigbeeClusterIasZone>(ZigbeeClusterLibrary::ClusterIdIasZone);
         if (!iasZoneCluster) {
+            info->finish(Thing::ThingErrorHardwareFailure);
             qCWarning(dcZigbeeTuya()) << "Could not find IAS zone cluster on" << thing << endpoint;
             return;
         }
+
+        info->finish(Thing::ThingErrorNoError);
 
         if (iasZoneCluster->hasAttribute(ZigbeeClusterIasZone::AttributeCurrentZoneSensitivityLevel)) {
             thing->setSettingValue(vibrationSensorSettingsSensitivityParamTypeId, iasZoneCluster->attribute(ZigbeeClusterIasZone::AttributeCurrentZoneSensitivityLevel).dataType().toUInt8());
@@ -384,6 +396,8 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
             info->finish(Thing::ThingErrorHardwareNotAvailable, QT_TR_NOOP("Unable to find Tuya cluster on Zigbee node."));
             return;
         }
+
+        info->finish(Thing::ThingErrorNoError);
 
         cluster->executeClusterCommand(COMMAND_ID_DATA_QUERY, QByteArray(), ZigbeeClusterLibrary::DirectionClientToServer, true);
 
@@ -455,6 +469,8 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
             info->finish(Thing::ThingErrorHardwareNotAvailable, QT_TR_NOOP("Unable to find Tuya cluster on Zigbee node."));
             return;
         }
+
+        info->finish(Thing::ThingErrorNoError);
 
         if (node->reachable()) {
             cluster->executeClusterCommand(COMMAND_ID_DATA_QUERY, QByteArray(), ZigbeeClusterLibrary::DirectionClientToServer, true);
@@ -546,6 +562,8 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
             return;
         }
 
+        info->finish(Thing::ThingErrorNoError);
+
         if (node->reachable()) {
             cluster->executeClusterCommand(COMMAND_ID_DATA_QUERY, QByteArray(), ZigbeeClusterLibrary::DirectionClientToServer, true);
         }
@@ -614,6 +632,8 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
             return;
         }
 
+        info->finish(Thing::ThingErrorNoError);
+
         if (node->reachable()) {
             cluster->executeClusterCommand(COMMAND_ID_DATA_QUERY, QByteArray(), ZigbeeClusterLibrary::DirectionClientToServer, true);
         }
@@ -666,8 +686,6 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
 
         });
     }
-
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeeTuya::executeAction(ThingActionInfo *info)

@@ -217,6 +217,8 @@ void IntegrationPluginZigbeeTradfri::setupThing(ThingSetupInfo *info)
         return;
     }
 
+    info->finish(Thing::ThingErrorNoError);
+
     if (thing->thingClassId() == dimmableLightThingClassId
             || thing->thingClassId() == colorTemperatureLightThingClassId
             || thing->thingClassId() == colorLightThingClassId) {
@@ -566,7 +568,6 @@ void IntegrationPluginZigbeeTradfri::setupThing(ThingSetupInfo *info)
     if (thing->thingClassId() == signalRepeaterThingClassId) {
         connectToOtaOutputCluster(thing, endpoint);
     }
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeeTradfri::executeAction(ThingActionInfo *info)

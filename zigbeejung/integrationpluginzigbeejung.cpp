@@ -97,6 +97,9 @@ void IntegrationPluginZigbeeJung::setupThing(ThingSetupInfo *info)
             info->finish(Thing::ThingErrorHardwareNotAvailable);
             return;
         }
+
+        info->finish(Thing::ThingErrorNoError);
+
         connect(onOffCluster, &ZigbeeClusterOnOff::commandReceived, this, [=](ZigbeeClusterOnOff::Command command, const QByteArray &parameters){
             qCDebug(dcZigbeeJung()) << "OnOff command received:" << command << parameters;
             switch (command) {
@@ -132,11 +135,9 @@ void IntegrationPluginZigbeeJung::setupThing(ThingSetupInfo *info)
 
         connectToOtaOutputCluster(thing, endpoint);
 
-        info->finish(Thing::ThingErrorNoError);
         return;
     }
 
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeeJung::executeAction(ThingActionInfo *info)

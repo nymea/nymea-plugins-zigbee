@@ -184,6 +184,8 @@ void IntegrationPluginZigbeeDevelco::setupThing(ThingSetupInfo *info)
             return;
         }
 
+        info->finish(Thing::ThingErrorNoError);
+
         if (primaryEndpoint->hasInputCluster(ZigbeeClusterLibrary::ClusterIdBasic)) {
             ZigbeeCluster *basicCluster = primaryEndpoint->getInputCluster(ZigbeeClusterLibrary::ClusterIdBasic);
             if (basicCluster->hasAttribute(DEVELCO_BASIC_ATTRIBUTE_SW_VERSION)) {
@@ -330,6 +332,7 @@ void IntegrationPluginZigbeeDevelco::setupThing(ThingSetupInfo *info)
             return;
         }
 
+        info->finish(Thing::ThingErrorNoError);
 
         // Version state
         if (sensorEndpoint->hasInputCluster(ZigbeeClusterLibrary::ClusterIdBasic)) {
@@ -408,21 +411,29 @@ void IntegrationPluginZigbeeDevelco::setupThing(ThingSetupInfo *info)
             });
         }
     } else if (thing->thingClassId() == smokeSensorThingClassId) {
+        info->finish(Thing::ThingErrorNoError);
+
         ZigbeeNodeEndpoint *iasZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
         ZigbeeNodeEndpoint *temperatureSensorEndpoint = node->getEndpoint(DEVELCO_EP_TEMPERATURE_SENSOR);
         connectToIasZoneInputCluster(thing, iasZoneEndpoint, "fireDetected");
         connectToTemperatureMeasurementInputCluster(thing, temperatureSensorEndpoint);
     } else if (thing->thingClassId() == waterSensorThingClassId) {
+        info->finish(Thing::ThingErrorNoError);
+
         ZigbeeNodeEndpoint *iazZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
         ZigbeeNodeEndpoint *temperatureSensorEndpoint = node->getEndpoint(DEVELCO_EP_TEMPERATURE_SENSOR);
         connectToIasZoneInputCluster(thing, iazZoneEndpoint, "waterDetected");
         connectToTemperatureMeasurementInputCluster(thing, temperatureSensorEndpoint);
     } else if (thing->thingClassId() == doorSensorThingClassId) {
+        info->finish(Thing::ThingErrorNoError);
+
         ZigbeeNodeEndpoint *iazZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
         ZigbeeNodeEndpoint *temperatureSensorEndpoint = node->getEndpoint(DEVELCO_EP_TEMPERATURE_SENSOR);
         connectToIasZoneInputCluster(thing, iazZoneEndpoint, "closed", true);
         connectToTemperatureMeasurementInputCluster(thing, temperatureSensorEndpoint);
     } else if (thing->thingClassId() == motionSensorThingClassId) {
+        info->finish(Thing::ThingErrorNoError);
+
         ZigbeeNodeEndpoint *iazZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
         ZigbeeNodeEndpoint *temperatureSensorEndpoint = node->getEndpoint(DEVELCO_EP_TEMPERATURE_SENSOR);
         ZigbeeNodeEndpoint *illuminanceSensorEndpoint = node->getEndpoint(DEVELCO_EP_LIGHT_SENSOR);
@@ -430,8 +441,6 @@ void IntegrationPluginZigbeeDevelco::setupThing(ThingSetupInfo *info)
         connectToTemperatureMeasurementInputCluster(thing, temperatureSensorEndpoint);
         connectToIlluminanceMeasurementInputCluster(thing, illuminanceSensorEndpoint);
     }
-
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeeDevelco::postSetupThing(Thing *thing)

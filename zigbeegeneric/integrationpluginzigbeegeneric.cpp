@@ -272,6 +272,7 @@ void IntegrationPluginZigbeeGeneric::setupThing(ThingSetupInfo *info)
         return;
     }
 
+    info->finish(Thing::ThingErrorNoError);
 
     // Set the version
     thing->setStateValue("version", endpoint->softwareBuildId());
@@ -387,8 +388,6 @@ void IntegrationPluginZigbeeGeneric::setupThing(ThingSetupInfo *info)
         connectToOnOffOutputCluster(thing, endpoint);
         connectToLevelControlOutputCluster(thing, endpoint);
     }
-
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeeGeneric::executeAction(ThingActionInfo *info)

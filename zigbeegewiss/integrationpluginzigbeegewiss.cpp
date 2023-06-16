@@ -120,14 +120,15 @@ void IntegrationPluginZigbeeGewiss::setupThing(ThingSetupInfo *info)
 
         if (!endpoint1 || !endpoint2) {
             qCWarning(dcZigbeeGewiss()) << "one ore more endpoints not found" << thing->name();
+            info->finish(Thing::ThingErrorHardwareFailure);
             return;
         }
+        info->finish(Thing::ThingErrorNoError);
 
         connectToPowerConfigurationInputCluster(thing, endpoint1);
         connectToOnOffOutputCluster(thing, endpoint1, "Toggle 1", "On 1", "Off 1", "input1");
         connectToOnOffOutputCluster(thing, endpoint2, "Toggle 2", "On 2", "Off 2", "input2");
 
-        info->finish(Thing::ThingErrorNoError);
         return;
 
         // Single channel relay
@@ -135,13 +136,17 @@ void IntegrationPluginZigbeeGewiss::setupThing(ThingSetupInfo *info)
         ZigbeeNodeEndpoint *endpoint = node->getEndpoint(0x01);
         if (!endpoint) {
             qCWarning(dcZigbeeGewiss()) << "Endpoint not found" << thing->name();
+            info->finish(Thing::ThingErrorHardwareFailure);
             return;
         }
+
+        info->finish(Thing::ThingErrorNoError);
 
         ZigbeeClusterOnOff *onOffCluster = endpoint->inputCluster<ZigbeeClusterOnOff>(ZigbeeClusterLibrary::ClusterIdOnOff);
         if (!onOffCluster) {
             qCWarning(dcZigbeeGewiss()) << "Could not find on/off cluster on" << thing << endpoint;
         } else {
+
             if (onOffCluster->hasAttribute(ZigbeeClusterOnOff::AttributeOnOff)) {
                 thing->setStateValue(gwa1521ActuatorRelayStateTypeId, onOffCluster->power());
             }
@@ -151,11 +156,11 @@ void IntegrationPluginZigbeeGewiss::setupThing(ThingSetupInfo *info)
                 thing->setStateValue(gwa1521ActuatorRelayStateTypeId, power);
             });
         }
-        return info->finish(Thing::ThingErrorNoError);
+
+        return;
     }
-    qCWarning(dcZigbeeGewiss()) << "Thing class not found" << info->thing()->thingClassId();
+
     Q_ASSERT_X(false, "ZigbeeGewiss", "Unhandled thing class");
-    return info->finish(Thing::ThingErrorThingClassNotFound);
 }
 
 void IntegrationPluginZigbeeGewiss::executeAction(ThingActionInfo *info)

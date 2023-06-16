@@ -171,6 +171,8 @@ void IntegrationPluginZigbeeLumi::setupThing(ThingSetupInfo *info)
         return;
     }
 
+    info->finish(Thing::ThingErrorNoError);
+
     // Set the version
     thing->setStateValue("version", endpoint->softwareBuildId());
 
@@ -718,7 +720,6 @@ void IntegrationPluginZigbeeLumi::setupThing(ThingSetupInfo *info)
         }
     }
 
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeeLumi::executeAction(ThingActionInfo *info)
