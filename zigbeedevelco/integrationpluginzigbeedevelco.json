@@ -153,7 +153,7 @@
                     "name": "airQualitySensor",
                     "displayName": "Air qualiy sensor",
                     "createMethods": ["auto"],
-                    "interfaces": ["vocsensor", "temperaturesensor", "humiditysensor", "battery", "wirelessconnectable"],
+                    "interfaces": ["vocsensor", "temperaturesensor", "humiditysensor", "battery", "wirelessconnectable", "update"],
                     "paramTypes": [
                         {
                             "id": "dbad9e63-1adc-45ef-8bfc-4947060f19f4",
@@ -239,16 +239,56 @@
                             "unit": "PartsPerBillion",
                             "suggestLogging": true,
                             "defaultValue": 0
+                        },
+                        {
+                            "id": "0ce38986-4700-47ef-a672-51853485e5f5",
+                            "name": "updateStatus",
+                            "displayName": "Update status",
+                            "type": "QString",
+                            "possibleValues": ["idle", "available", "updating"],
+                            "defaultValue": "idle",
+                            "cached": false
+                        },
+                        {
+                            "id": "b66948ad-59fd-420b-a7cd-4937b63050d5",
+                            "name": "currentVersion",
+                            "displayName": "Version",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "80434d6d-2cde-4671-a050-8352f6aff2de",
+                            "name": "availableVersion",
+                            "displayName": "Available firmware version",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "0b9488fa-458f-4c9b-9035-60f7d3d559e4",
+                            "name": "updateProgress",
+                            "displayName": "Update progress",
+                            "type": "uint",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "unit": "Percentage",
+                            "defaultValue": 0,
+                            "cached": false
                         }
                     ],
-                    "actionTypes": [ ]
+                    "actionTypes": [
+                        {
+                            "id": "24b2a7ec-66c7-4e9e-8f92-1dee3373ff63",
+                            "name": "performUpdate",
+                            "displayName": "Start update"
+                        }
+                    ]
                 },
                 {
                     "id": "f41ea8de-6df0-40b6-8fc1-95334659a964",
                     "name": "smokeSensor",
                     "displayName": "Smoke sensor",
                     "createMethods": ["auto"],
-                    "interfaces": ["firesensor", "temperaturesensor", "battery", "wirelessconnectable"],
+                    "interfaces": ["firesensor", "temperaturesensor", "battery", "wirelessconnectable", "update"],
                     "paramTypes": [
                         {
                             "id": "47c8c49d-f36f-4526-927b-f13e76ee79e1",
@@ -319,6 +359,40 @@
                             "displayNameEvent": "Battery critical changed",
                             "type": "bool",
                             "defaultValue": false
+                        },
+                        {
+                            "id": "b3cdd902-dc00-4a6f-9ed0-c97347726397",
+                            "name": "updateStatus",
+                            "displayName": "Update status",
+                            "type": "QString",
+                            "possibleValues": ["idle", "available", "updating"],
+                            "defaultValue": "idle",
+                            "cached": false
+                        },
+                        {
+                            "id": "9170282f-eb7e-40ca-a6a6-cd51f7f3d2bb",
+                            "name": "currentVersion",
+                            "displayName": "Version",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "b7e5325d-640c-4781-91f0-68ce669cf873",
+                            "name": "availableVersion",
+                            "displayName": "Available firmware version",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "ac365d01-b58a-4974-a6c0-57472fd2553a",
+                            "name": "updateProgress",
+                            "displayName": "Update progress",
+                            "type": "uint",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "unit": "Percentage",
+                            "defaultValue": 0,
+                            "cached": false
                         }
                     ],
                     "actionTypes": [
@@ -338,6 +412,11 @@
                                     "defaultValue": 600
                                 }
                             ]
+                        },
+                        {
+                            "id": "2860002a-4d15-450a-b973-8877da4ad3ad",
+                            "name": "performUpdate",
+                            "displayName": "Start update"
                         }
                     ]
                 },
@@ -346,7 +425,7 @@
                     "name": "waterSensor",
                     "displayName": "Water sensor",
                     "createMethods": ["auto"],
-                    "interfaces": ["watersensor", "temperaturesensor", "battery", "wirelessconnectable"],
+                    "interfaces": ["watersensor", "temperaturesensor", "battery", "wirelessconnectable", "update"],
                     "paramTypes": [
                         {
                             "id": "d1e17923-72ef-4390-ab7d-1bd2174d805c",
@@ -417,6 +496,47 @@
                             "displayNameEvent": "Battery critical changed",
                             "type": "bool",
                             "defaultValue": false
+                        },
+                        {
+                            "id": "74a82258-5a7c-44f5-af98-3aa3afcbe08e",
+                            "name": "updateStatus",
+                            "displayName": "Update status",
+                            "type": "QString",
+                            "possibleValues": ["idle", "available", "updating"],
+                            "defaultValue": "idle",
+                            "cached": false
+                        },
+                        {
+                            "id": "16ff5d40-77f0-46fa-bda0-1ef35eae12fc",
+                            "name": "currentVersion",
+                            "displayName": "Version",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "a4fdb89d-230f-454b-a4b4-12bc84a19e8c",
+                            "name": "availableVersion",
+                            "displayName": "Available firmware version",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "9dcde658-9048-41da-b4ac-3cbe62a8609e",
+                            "name": "updateProgress",
+                            "displayName": "Update progress",
+                            "type": "uint",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "unit": "Percentage",
+                            "defaultValue": 0,
+                            "cached": false
+                        }
+                    ],
+                    "actionTypes": [
+                        {
+                            "id": "4d40f75d-fb8a-47af-9a03-98f828765887",
+                            "name": "performUpdate",
+                            "displayName": "Start update"
                         }
                     ]
                 },
@@ -425,7 +545,7 @@
                     "name": "doorSensor",
                     "displayName": "Door/Window sensor",
                     "createMethods": ["auto"],
-                    "interfaces": ["closablesensor", "temperaturesensor", "battery", "wirelessconnectable"],
+                    "interfaces": ["closablesensor", "temperaturesensor", "battery", "wirelessconnectable", "update"],
                     "paramTypes": [
                         {
                             "id": "06e6cfe6-96c4-446a-a1f1-6ce3ab4ab9a6",
@@ -496,6 +616,47 @@
                             "displayNameEvent": "Battery critical changed",
                             "type": "bool",
                             "defaultValue": false
+                        },
+                        {
+                            "id": "a59533d3-6974-47a1-aca7-a2483981a134",
+                            "name": "updateStatus",
+                            "displayName": "Update status",
+                            "type": "QString",
+                            "possibleValues": ["idle", "available", "updating"],
+                            "defaultValue": "idle",
+                            "cached": false
+                        },
+                        {
+                            "id": "5ca4251c-4f35-405c-bf16-373c3f791ada",
+                            "name": "currentVersion",
+                            "displayName": "Version",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "a3ec91c5-5348-4eb5-99a1-f0303227bee5",
+                            "name": "availableVersion",
+                            "displayName": "Available firmware version",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "9e4b4603-470c-4bea-ae5c-0dbeaf6da570",
+                            "name": "updateProgress",
+                            "displayName": "Update progress",
+                            "type": "uint",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "unit": "Percentage",
+                            "defaultValue": 0,
+                            "cached": false
+                        }
+                    ],
+                    "actionTypes": [
+                        {
+                            "id": "51d98b39-9d88-4947-be46-72c7ebde2a79",
+                            "name": "performUpdate",
+                            "displayName": "Start update"
                         }
                     ]
                 },
@@ -504,7 +665,7 @@
                     "name": "motionSensor",
                     "displayName": "Motion sensor",
                     "createMethods": ["auto"],
-                    "interfaces": ["presencesensor", "temperaturesensor", "lightsensor", "battery", "wirelessconnectable"],
+                    "interfaces": ["presencesensor", "temperaturesensor", "lightsensor", "battery", "wirelessconnectable", "update"],
                     "paramTypes": [
                         {
                             "id": "18221173-4c1a-42a9-9631-413ea2a4ccfc",
@@ -592,6 +753,47 @@
                             "displayNameEvent": "Battery critical changed",
                             "type": "bool",
                             "defaultValue": false
+                        },
+                        {
+                            "id": "5ccd02af-b646-4dcf-867c-867b0d5011f9",
+                            "name": "updateStatus",
+                            "displayName": "Update status",
+                            "type": "QString",
+                            "possibleValues": ["idle", "available", "updating"],
+                            "defaultValue": "idle",
+                            "cached": false
+                        },
+                        {
+                            "id": "0e864bc8-45d0-4cf3-9ad9-cee15a4e2311",
+                            "name": "currentVersion",
+                            "displayName": "Version",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "187dd962-4f44-4d1b-9b34-7e491c71d951",
+                            "name": "availableVersion",
+                            "displayName": "Available firmware version",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "0736ac21-0f21-4d50-ade5-90cd18f64a1c",
+                            "name": "updateProgress",
+                            "displayName": "Update progress",
+                            "type": "uint",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "unit": "Percentage",
+                            "defaultValue": 0,
+                            "cached": false
+                        }
+                    ],
+                    "actionTypes": [
+                        {
+                            "id": "915dccbb-4220-45d0-b074-9446079b47e6",
+                            "name": "performUpdate",
+                            "displayName": "Start update"
                         }
                     ]
                 }

@@ -355,6 +355,7 @@ void IntegrationPluginZigbeeDevelco::createConnections(Thing *thing)
 
         connectToTemperatureMeasurementInputCluster(thing, sensorEndpoint);
         connectToRelativeHumidityMeasurementInputCluster(thing, sensorEndpoint);
+        connectToOtaOutputCluster(thing, sensorEndpoint);
 
         // Battery voltage
         ZigbeeClusterPowerConfiguration *powerConfigurationCluster = sensorEndpoint->inputCluster<ZigbeeClusterPowerConfiguration>(ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
@@ -419,22 +420,26 @@ void IntegrationPluginZigbeeDevelco::createConnections(Thing *thing)
         ZigbeeNodeEndpoint *iasZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
         ZigbeeNodeEndpoint *temperatureSensorEndpoint = node->getEndpoint(DEVELCO_EP_TEMPERATURE_SENSOR);
         connectToIasZoneInputCluster(thing, iasZoneEndpoint, "fireDetected");
+        connectToOtaOutputCluster(thing, iasZoneEndpoint);
         connectToTemperatureMeasurementInputCluster(thing, temperatureSensorEndpoint);
     } else if (thing->thingClassId() == waterSensorThingClassId) {
-        ZigbeeNodeEndpoint *iazZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
+        ZigbeeNodeEndpoint *iasZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
         ZigbeeNodeEndpoint *temperatureSensorEndpoint = node->getEndpoint(DEVELCO_EP_TEMPERATURE_SENSOR);
-        connectToIasZoneInputCluster(thing, iazZoneEndpoint, "waterDetected");
+        connectToIasZoneInputCluster(thing, iasZoneEndpoint, "waterDetected");
+        connectToOtaOutputCluster(thing, iasZoneEndpoint);
         connectToTemperatureMeasurementInputCluster(thing, temperatureSensorEndpoint);
     } else if (thing->thingClassId() == doorSensorThingClassId) {
-        ZigbeeNodeEndpoint *iazZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
+        ZigbeeNodeEndpoint *iasZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
         ZigbeeNodeEndpoint *temperatureSensorEndpoint = node->getEndpoint(DEVELCO_EP_TEMPERATURE_SENSOR);
-        connectToIasZoneInputCluster(thing, iazZoneEndpoint, "closed", true);
+        connectToIasZoneInputCluster(thing, iasZoneEndpoint, "closed", true);
+        connectToOtaOutputCluster(thing, iasZoneEndpoint);
         connectToTemperatureMeasurementInputCluster(thing, temperatureSensorEndpoint);
     } else if (thing->thingClassId() == motionSensorThingClassId) {
-        ZigbeeNodeEndpoint *iazZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
+        ZigbeeNodeEndpoint *iasZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
         ZigbeeNodeEndpoint *temperatureSensorEndpoint = node->getEndpoint(DEVELCO_EP_TEMPERATURE_SENSOR);
         ZigbeeNodeEndpoint *illuminanceSensorEndpoint = node->getEndpoint(DEVELCO_EP_LIGHT_SENSOR);
-        connectToIasZoneInputCluster(thing, iazZoneEndpoint, "isPresent");
+        connectToIasZoneInputCluster(thing, iasZoneEndpoint, "isPresent");
+        connectToOtaOutputCluster(thing, iasZoneEndpoint);
         connectToTemperatureMeasurementInputCluster(thing, temperatureSensorEndpoint);
         connectToIlluminanceMeasurementInputCluster(thing, illuminanceSensorEndpoint);
     }
@@ -607,9 +612,9 @@ void IntegrationPluginZigbeeDevelco::executeAction(ThingActionInfo *info)
         }
     }
     if (thing->thingClassId() == smokeSensorThingClassId) {
+        ZigbeeNodeEndpoint *iasZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
         if (info->action().actionTypeId() == smokeSensorAlarmActionTypeId) {
-            ZigbeeNodeEndpoint *iazZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
-            ZigbeeClusterIasWd *iasWdCluster = iazZoneEndpoint->inputCluster<ZigbeeClusterIasWd>(ZigbeeClusterLibrary::ClusterIdIasWd);
+            ZigbeeClusterIasWd *iasWdCluster = iasZoneEndpoint->inputCluster<ZigbeeClusterIasWd>(ZigbeeClusterLibrary::ClusterIdIasWd);
             if (!iasWdCluster) {
                 qCWarning(dcZigbeeDevelco()) << "Could not find IAS WD cluster for" << thing << "in" << node;
                 info->finish(Thing::ThingErrorHardwareFailure);
@@ -620,6 +625,47 @@ void IntegrationPluginZigbeeDevelco::executeAction(ThingActionInfo *info)
             connect(reply, &ZigbeeClusterReply::finished, this, [reply, info]() {
                 info->finish(reply->error() == ZigbeeClusterReply::ErrorNoError ? Thing::ThingErrorNoError:  Thing::ThingErrorHardwareFailure);
             });
+            return;
+        }
+        if (info->action().actionTypeId() == smokeSensorPerformUpdateActionTypeId) {
+            enableFirmwareUpdate(info->thing());
+            executeImageNotifyOtaOutputCluster(info, iasZoneEndpoint);
+            return;
+        }
+    }
+
+    if (thing->thingClassId() == airQualitySensorThingClassId) {
+        if (info->action().actionTypeId() == airQualitySensorPerformUpdateActionTypeId) {
+            ZigbeeNodeEndpoint *temperatureSensorEndpoint = node->getEndpoint(DEVELCO_EP_TEMPERATURE_SENSOR);
+            enableFirmwareUpdate(info->thing());
+            executeImageNotifyOtaOutputCluster(info, temperatureSensorEndpoint);
+            return;
+        }
+    }
+
+    if (thing->thingClassId() == waterSensorThingClassId) {
+        if (info->action().actionTypeId() == smokeSensorPerformUpdateActionTypeId) {
+            ZigbeeNodeEndpoint *iasZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
+            enableFirmwareUpdate(info->thing());
+            executeImageNotifyOtaOutputCluster(info, iasZoneEndpoint);
+            return;
+        }
+    }
+
+    if (thing->thingClassId() == doorSensorThingClassId) {
+        if (info->action().actionTypeId() == doorSensorPerformUpdateActionTypeId) {
+            ZigbeeNodeEndpoint *iasZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
+            enableFirmwareUpdate(info->thing());
+            executeImageNotifyOtaOutputCluster(info, iasZoneEndpoint);
+            return;
+        }
+    }
+
+    if (thing->thingClassId() == motionSensorThingClassId) {
+        if (info->action().actionTypeId() == motionSensorPerformUpdateActionTypeId) {
+            ZigbeeNodeEndpoint *iasZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
+            enableFirmwareUpdate(info->thing());
+            executeImageNotifyOtaOutputCluster(info, iasZoneEndpoint);
             return;
         }
     }
