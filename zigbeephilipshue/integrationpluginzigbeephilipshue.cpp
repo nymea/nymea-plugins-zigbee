@@ -404,7 +404,7 @@ void IntegrationPluginZigbeePhilipsHue::createConnections(Thing *thing)
                 }
             });
 
-            connect(thing, &Thing::settingChanged, this, [=](const ParamTypeId &settingTypeId, const QVariant &value){
+            connect(thing, &Thing::settingChanged, basicCluster, [=](const ParamTypeId &settingTypeId, const QVariant &value){
                 if (settingTypeId == wallSwitchModuleSettingsButtonModeParamTypeId) {
                     quint8 buttonMode = modeMap.key(value.toString());
                     ZigbeeClusterLibrary::WriteAttributeRecord deviceModeAttribute;
@@ -413,7 +413,7 @@ void IntegrationPluginZigbeePhilipsHue::createConnections(Thing *thing)
                     deviceModeAttribute.data = ZigbeeDataType(buttonMode).data();
 
                     qCDebug(dcZigbeePhilipsHue()) << "Setting device mode config to" << value.toString();
-                    writeAttributesDelayed(endpointHa->getInputCluster(ZigbeeClusterLibrary::ClusterIdBasic), {deviceModeAttribute}, Zigbee::Philips);
+                    writeAttributesDelayed(basicCluster, {deviceModeAttribute}, Zigbee::Philips);
                 }
             });
         }
