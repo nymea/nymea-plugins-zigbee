@@ -160,6 +160,18 @@ bool IntegrationPluginZigbeeDevelco::handleNode(ZigbeeNode *node, const QUuid &n
 
     }
 
+    if (node->hasEndpoint(2) && node->getEndpoint(2)->profile() == Zigbee::ZigbeeProfile::ZigbeeProfileHomeAutomation && node->getEndpoint(2)->deviceId() == Zigbee::HomeAutomationDeviceSmartPlug) {
+        ZigbeeNodeEndpoint *endpoint2 = node->getEndpoint(2);
+        bindCluster(endpoint2, ZigbeeClusterLibrary::ClusterIdOnOff);
+        configureOnOffInputClusterAttributeReporting(endpoint2);
+        bindCluster(endpoint2, ZigbeeClusterLibrary::ClusterIdMetering);
+        configureMeteringInputClusterAttributeReporting(endpoint2);
+        bindCluster(endpoint2, ZigbeeClusterLibrary::ClusterIdElectricalMeasurement);
+        configureElectricalMeasurementInputClusterAttributeReporting(endpoint2);
+        createThing(powerSocketThingClassId, node);
+        return true;
+    }
+
     return false;
 }
 
@@ -442,6 +454,12 @@ void IntegrationPluginZigbeeDevelco::createConnections(Thing *thing)
         connectToOtaOutputCluster(thing, iasZoneEndpoint);
         connectToTemperatureMeasurementInputCluster(thing, temperatureSensorEndpoint);
         connectToIlluminanceMeasurementInputCluster(thing, illuminanceSensorEndpoint);
+    } else if (thing->thingClassId() == powerSocketThingClassId) {
+        ZigbeeNodeEndpoint *endpoint2 = node->getEndpoint(2);
+        connectToOnOffInputCluster(thing, endpoint2);
+        connectToMeteringCluster(thing, endpoint2);
+        connectToElectricalMeasurementCluster(thing, endpoint2);
+        connectToOtaOutputCluster(thing, endpoint2);
     }
 }
 
@@ -666,6 +684,14 @@ void IntegrationPluginZigbeeDevelco::executeAction(ThingActionInfo *info)
             ZigbeeNodeEndpoint *iasZoneEndpoint = node->getEndpoint(DEVELCO_EP_IAS_ZONE);
             enableFirmwareUpdate(info->thing());
             executeImageNotifyOtaOutputCluster(info, iasZoneEndpoint);
+            return;
+        }
+    }
+    if (thing->thingClassId() == powerSocketThingClassId) {
+        if (info->action().actionTypeId() == motionSensorPerformUpdateActionTypeId) {
+            ZigbeeNodeEndpoint *endpoint2 = node->getEndpoint(2);
+            enableFirmwareUpdate(info->thing());
+            executeImageNotifyOtaOutputCluster(info, endpoint2);
             return;
         }
     }
