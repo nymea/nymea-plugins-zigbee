@@ -510,6 +510,105 @@
                     ]
                 },
                 {
+                    "name": "powerSocket",
+                    "displayName": "Power socket",
+                    "id": "856bb6a7-65e8-44cb-b77a-ce46f742f33d",
+                    "setupMethod": "JustAdd",
+                    "createMethods": [ "auto" ],
+                    "interfaces": [ "powersocket", "wirelessconnectable", "update" ],
+                    "paramTypes": [
+                        {
+                            "id": "1db22159-08a3-43d0-b515-7b34211b1d04",
+                            "name": "ieeeAddress",
+                            "displayName": "IEEE adress",
+                            "type": "QString",
+                            "defaultValue": "00:00:00:00:00:00:00:00"
+                        },
+                        {
+                            "id": "26e92d1d-bc2f-4ccd-ad1f-d6d6189d2609",
+                            "name": "networkUuid",
+                            "displayName": "Zigbee network UUID",
+                            "type": "QString",
+                            "defaultValue": ""
+                        }
+                    ],
+                    "stateTypes": [
+                        {
+                            "id": "99117bce-b9c3-4b43-b853-65585a99926e",
+                            "name": "connected",
+                            "displayName": "Connected",
+                            "displayNameEvent": "Connected changed",
+                            "type": "bool",
+                            "cached": false,
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "51a5f34e-880c-4b77-899c-763f2b9bef97",
+                            "name": "signalStrength",
+                            "displayName": "Signal strength",
+                            "displayNameEvent": "Signal strength changed",
+                            "defaultValue": 0,
+                            "maxValue": 100,
+                            "minValue": 0,
+                            "type": "uint",
+                            "unit": "Percentage"
+                        },
+                        {
+                            "id": "7d28e7b0-0c4a-4d69-a595-53b9e9b512c9",
+                            "name": "power",
+                            "displayName": "Power",
+                            "displayNameEvent": "Power changed",
+                            "displayNameAction": "Set power",
+                            "type": "bool",
+                            "defaultValue": false,
+                            "writable": true,
+                            "ioType": "digitalOutput"
+                        },
+                        {
+                            "id": "301b9aee-4a30-4873-bfd9-cfcacc40fbf1",
+                            "name": "currentVersion",
+                            "displayName": "Version",
+                            "displayNameEvent": "Version changed",
+                            "type": "QString",
+                            "cached": true,
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "66b60151-5777-45e3-be51-9b490b650990",
+                            "name": "updateStatus",
+                            "displayName": "Update status",
+                            "type": "QString",
+                            "possibleValues": ["idle", "available", "updating"],
+                            "defaultValue": "idle",
+                            "cached": false
+                        },
+                        {
+                            "id": "844eecd8-2a4f-45a5-ac2d-5bb73eaf5a29",
+                            "name": "availableVersion",
+                            "displayName": "Available version",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "4977cd0d-8c73-43c1-a9a6-c0db8d54219d",
+                            "name": "updateProgress",
+                            "displayName": "Update progress",
+                            "type": "uint",
+                            "unit": "Percentage",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "defaultValue": 0
+                        }
+                    ],
+                    "actionTypes": [
+                    {
+                        "id": "b5b4841d-0c50-4d21-8101-36a631c1aa00",
+                        "name": "performUpdate",
+                        "displayName": "Perform firmware update"
+                    }
+                    ]
+                },
+                {
                     "name": "shortcutButton",
                     "displayName": "TRÅDFRI Shortcut Button",
                     "id": "7a81dd57-0b79-4735-840d-69775d937095",
