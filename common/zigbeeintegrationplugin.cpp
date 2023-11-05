@@ -920,17 +920,32 @@ void ZigbeeIntegrationPlugin::connectToTemperatureMeasurementInputCluster(Thing 
     if (temperatureMeasurementCluster->hasAttribute(ZigbeeClusterTemperatureMeasurement::AttributeMeasuredValue)) {
         thing->setStateValue("temperature", temperatureMeasurementCluster->temperature());
     }
+    if (temperatureMeasurementCluster->hasAttribute(ZigbeeClusterTemperatureMeasurement::AttributeMinMeasuredValue)) {
+        thing->setStateMinValue("temperature", temperatureMeasurementCluster->minTemperature());
+    }
+    if (temperatureMeasurementCluster->hasAttribute(ZigbeeClusterTemperatureMeasurement::AttributeMaxMeasuredValue)) {
+        thing->setStateMaxValue("temperature", temperatureMeasurementCluster->maxTemperature());
+    }
+
     if (endpoint->node()->reachable()) {
-        temperatureMeasurementCluster->readAttributes({ZigbeeClusterTemperatureMeasurement::AttributeMeasuredValue});
+        temperatureMeasurementCluster->readMinMaxTemperature();
     }
     connect(endpoint->node(), &ZigbeeNode::reachableChanged, temperatureMeasurementCluster, [temperatureMeasurementCluster](bool reachable){
         if (reachable) {
-            temperatureMeasurementCluster->readAttributes({ZigbeeClusterTemperatureMeasurement::AttributeMeasuredValue});
+            temperatureMeasurementCluster->readTemperature();
         }
     });
     connect(temperatureMeasurementCluster, &ZigbeeClusterTemperatureMeasurement::temperatureChanged, thing, [=](double temperature) {
         qCDebug(m_dc) << "Temperature for" << thing->name() << "changed to:" << temperature;
         thing->setStateValue("temperature", temperature);
+    });
+    connect(temperatureMeasurementCluster, &ZigbeeClusterTemperatureMeasurement::minTemperatureChanged, thing, [=](double minTemperature) {
+        qCDebug(m_dc) << "Min temperature for" << thing->name() << "changed to:" << minTemperature;
+        thing->setStateMinValue("temperature", minTemperature);
+    });
+    connect(temperatureMeasurementCluster, &ZigbeeClusterTemperatureMeasurement::maxTemperatureChanged, thing, [=](double maxTemperature) {
+        qCDebug(m_dc) << "Max temperature for" << thing->name() << "changed to:" << maxTemperature;
+        thing->setStateMaxValue("temperature", maxTemperature);
     });
 }
 
