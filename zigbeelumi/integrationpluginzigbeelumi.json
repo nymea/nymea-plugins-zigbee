@@ -248,7 +248,7 @@
                     "id": "0b582616-0b05-4ac9-8b59-51b66079b571",
                     "setupMethod": "JustAdd",
                     "createMethods": [ "Auto" ],
-                    "interfaces": [ "pressuresensor", "temperaturesensor", "humiditysensor", "wirelessconnectable" ],
+                    "interfaces": [ "pressuresensor", "temperaturesensor", "humiditysensor", "wirelessconnectable", "battery" ],
                     "paramTypes": [
                         {
                             "id": "ef1129e2-bdf8-423e-9c11-fa8b406f960b",
@@ -325,6 +325,23 @@
                             "minValue": 0,
                             "maxValue": 2000,
                             "defaultValue": 0.0
+                        },
+                        {
+                            "id": "ba78c78f-537c-463f-8289-76fa937cf2bf",
+                            "name": "batteryCritical",
+                            "displayName": "Battery level critical",
+                            "type": "bool",
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "25aa4e57-2444-4127-b1aa-9b52ea5dea62",
+                            "name": "batteryLevel",
+                            "displayName": "Battery level",
+                            "type": "int",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "defaultValue": 0,
+                            "unit": "Percentage"
                         }
                     ],
                     "actionTypes": [
