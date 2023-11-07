@@ -185,7 +185,7 @@
                         {
                             "id": "0689e60d-8022-4537-9284-53d7cd91a78b",
                             "name": "batteryCritical",
-                            "displayName": "Battery leve critical",
+                            "displayName": "Battery level critical",
                             "type": "bool",
                             "defaultValue": false
                         },
