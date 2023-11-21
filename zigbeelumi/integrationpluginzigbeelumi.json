@@ -19,7 +19,7 @@
                         {
                             "id": "bd0b2bf2-2ec3-497f-9679-a63850101257",
                             "name": "ieeeAddress",
-                            "displayName": "IEEE adress",
+                            "displayName": "IEEE address",
                             "type": "QString",
                             "defaultValue": "00:00:00:00:00:00:00:00"
                         },
@@ -100,7 +100,7 @@
                         {
                             "id": "1d5b406b-7213-481c-bfa3-8071ad5f79a3",
                             "name": "ieeeAddress",
-                            "displayName": "IEEE adress",
+                            "displayName": "IEEE address",
                             "type": "QString",
                             "defaultValue": "00:00:00:00:00:00:00:00"
                         },
@@ -185,7 +185,7 @@
                         {
                             "id": "0689e60d-8022-4537-9284-53d7cd91a78b",
                             "name": "batteryCritical",
-                            "displayName": "Battery leve critical",
+                            "displayName": "Battery level critical",
                             "type": "bool",
                             "defaultValue": false
                         },
@@ -248,12 +248,12 @@
                     "id": "0b582616-0b05-4ac9-8b59-51b66079b571",
                     "setupMethod": "JustAdd",
                     "createMethods": [ "Auto" ],
-                    "interfaces": [ "pressuresensor", "temperaturesensor", "humiditysensor", "wirelessconnectable" ],
+                    "interfaces": [ "pressuresensor", "temperaturesensor", "humiditysensor", "wirelessconnectable", "battery" ],
                     "paramTypes": [
                         {
                             "id": "ef1129e2-bdf8-423e-9c11-fa8b406f960b",
                             "name": "ieeeAddress",
-                            "displayName": "IEEE adress",
+                            "displayName": "IEEE address",
                             "type": "QString",
                             "defaultValue": "00:00:00:00:00:00:00:00"
                         },
@@ -325,6 +325,23 @@
                             "minValue": 0,
                             "maxValue": 2000,
                             "defaultValue": 0.0
+                        },
+                        {
+                            "id": "ba78c78f-537c-463f-8289-76fa937cf2bf",
+                            "name": "batteryCritical",
+                            "displayName": "Battery level critical",
+                            "type": "bool",
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "25aa4e57-2444-4127-b1aa-9b52ea5dea62",
+                            "name": "batteryLevel",
+                            "displayName": "Battery level",
+                            "type": "int",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "defaultValue": 0,
+                            "unit": "Percentage"
                         }
                     ],
                     "actionTypes": [
@@ -345,7 +362,7 @@
                         {
                             "id": "36d8a40a-7f37-4d59-a0d9-6d4977ea63f3",
                             "name": "ieeeAddress",
-                            "displayName": "IEEE adress",
+                            "displayName": "IEEE address",
                             "type": "QString",
                             "defaultValue": "00:00:00:00:00:00:00:00"
                         },
@@ -415,7 +432,7 @@
                         {
                             "id": "929eb2be-6d8f-46b7-8cc9-896e7e2c494a",
                             "name": "ieeeAddress",
-                            "displayName": "IEEE adress",
+                            "displayName": "IEEE address",
                             "type": "QString",
                             "defaultValue": "00:00:00:00:00:00:00:00"
                         },
@@ -486,7 +503,7 @@
                         {
                             "id": "97e02264-deca-4968-b28e-52f7c72adade",
                             "name": "ieeeAddress",
-                            "displayName": "IEEE adress",
+                            "displayName": "IEEE address",
                             "type": "QString",
                             "defaultValue": "00:00:00:00:00:00:00:00"
                         },
@@ -571,7 +588,7 @@
                         {
                             "id": "3a44ed47-5a70-4052-9a14-78f9033eab85",
                             "name": "ieeeAddress",
-                            "displayName": "IEEE adress",
+                            "displayName": "IEEE address",
                             "type": "QString",
                             "defaultValue": "00:00:00:00:00:00:00:00"
                         },
@@ -670,7 +687,7 @@
                         {
                             "id": "ce4aa2a2-61bd-407a-ba44-c5027ffb6811",
                             "name": "ieeeAddress",
-                            "displayName": "IEEE adress",
+                            "displayName": "IEEE address",
                             "type": "QString",
                             "defaultValue": "00:00:00:00:00:00:00:00"
                         },
@@ -772,7 +789,7 @@
                         {
                             "id": "e3a52900-320e-4ada-957a-6a10594f08c8",
                             "name": "ieeeAddress",
-                            "displayName": "IEEE adress",
+                            "displayName": "IEEE address",
                             "type": "QString",
                             "defaultValue": "00:00:00:00:00:00:00:00"
                         },
@@ -862,7 +879,7 @@
                         {
                             "id": "e12453e7-5fc3-4549-b4fc-8b85f78607c6",
                             "name": "ieeeAddress",
-                            "displayName": "IEEE adress",
+                            "displayName": "IEEE address",
                             "type": "QString",
                             "defaultValue": "00:00:00:00:00:00:00:00"
                         },
@@ -940,7 +957,7 @@
                         {
                             "id": "324cd9a0-3381-490b-9537-88b65e0093bf",
                             "name": "ieeeAddress",
-                            "displayName": "IEEE adress",
+                            "displayName": "IEEE address",
                             "type": "QString",
                             "defaultValue": "00:00:00:00:00:00:00:00"
                         },
@@ -1072,7 +1089,7 @@
                         {
                             "id": "0ebea7b9-488d-490e-9d70-e04ec92efd67",
                             "name": "ieeeAddress",
-                            "displayName": "IEEE adress",
+                            "displayName": "IEEE address",
                             "type": "QString",
                             "defaultValue": "00:00:00:00:00:00:00:00"
                         },
@@ -1197,7 +1214,7 @@
                         {
                             "id": "f4a51b83-9cfa-402f-9d2a-e42933e33660",
                             "name": "ieeeAddress",
-                            "displayName": "IEEE adress",
+                            "displayName": "IEEE address",
                             "type": "QString",
                             "defaultValue": "00:00:00:00:00:00:00:00"
                         },
@@ -1280,7 +1297,7 @@
                         {
                             "id": "cce8b39c-ac8a-4a8f-b66e-b6100a209fb8",
                             "name": "ieeeAddress",
-                            "displayName": "IEEE adress",
+                            "displayName": "IEEE address",
                             "type": "QString",
                             "defaultValue": "00:00:00:00:00:00:00:00"
                         },
