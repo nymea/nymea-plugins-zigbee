@@ -170,6 +170,16 @@ bool IntegrationPluginZigbeeTuya::handleNode(ZigbeeNode *node, const QUuid &/*ne
         return true;
     }
 
+    if (match(node, "TS0203", {"_TZ3000_7d8yme6f"})) {
+        // Implements IAS Zone spec, but doesn't reply to ZoneType attribute, thus not handled properly by generic plugin
+        ZigbeeNodeEndpoint *endpoint = node->getEndpoint(0x01);
+        configurePowerConfigurationInputClusterAttributeReporting(endpoint);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdIasZone);
+        configureIasZoneInputClusterAttributeReporting(endpoint);
+        enrollIasZone(endpoint, 0x42);
+        createThing(closableSensorThingClassId, node);
+        return true;
+    }
     return false;
 }
 
@@ -666,6 +676,15 @@ void IntegrationPluginZigbeeTuya::createConnections(Thing *thing)
             }
 
         });
+    }
+
+    if (thing->thingClassId() == closableSensorThingClassId) {
+        ZigbeeNodeEndpoint *endpoint = node->getEndpoint(1);
+        if (!endpoint) {
+            qCWarning(dcZigbeeTuya()) << "Unable to find endpoint 1 on node" << node;
+            return;
+        }
+        connectToIasZoneInputCluster(thing, endpoint, "closed", true);
     }
 }
 
