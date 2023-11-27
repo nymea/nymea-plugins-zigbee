@@ -91,6 +91,19 @@
 #define SMOKE_SENSOR_DP_BATTERY 15
 #define SMOKE_SENSOR_DP_TEST 101
 
+#define THERMOSTAT_DP_HEATING_SETPOINT 2
+#define THERMOSTAT_DP_LOCAL_TEMP 3
+#define THERMOSTAT_DP_MODE 4
+#define THERMOSTAT_DP_CHILD_LOCK 7
+#define THERMOSTAT_DP_WINDOW_OPEN_SITERWELL 18
+#define THERMOSTAT_DP_TEMP_CALIBRATION 44
+#define THERMOSTAT_DP_VALVE_OPEN 20
+#define THERMOSTAT_DP_BATTERY 21
+#define THERMOSTAT_DP_WINDOW_DETECTION 104
+#define THERMOSTAT_DP_BATTERY_LOW 110
+#define THERMOSTAT_DP_WINDOW_OPEN 115
+
+
 IntegrationPluginZigbeeTuya::IntegrationPluginZigbeeTuya(): ZigbeeIntegrationPlugin(ZigbeeHardwareResource::HandlerTypeVendor, dcZigbeeTuya())
 {
 }
@@ -125,7 +138,16 @@ bool IntegrationPluginZigbeeTuya::handleNode(ZigbeeNode *node, const QUuid &/*ne
         return true;
     }
 
-    if (node->nodeDescriptor().manufacturerCode == 0x1002 && node->modelName() == "TS0601") {
+    if (match(node, "TS0601", {
+              "_TZE200_auin8mzr",
+              "_TZE200_lyetpprm",
+              "_TZE200_jva8ink8",
+              "_TZE200_holel4dk",
+              "_TZE200_xpq2rzhq",
+              "_TZE200_wukb7rhc",
+              "_TZE204_xsm7l9xa",
+              "_TZE204_ztc6ggyl",
+              "_TZE200_ztc6ggyl"})) {
         createThing(presenceSensorThingClassId, node);
         return true;
     }
@@ -180,6 +202,20 @@ bool IntegrationPluginZigbeeTuya::handleNode(ZigbeeNode *node, const QUuid &/*ne
         createThing(closableSensorThingClassId, node);
         return true;
     }
+
+    if (match(node, "TS0601", {
+              "_TZE200_hhrtiq0x",
+              "_TZE200_zivfvd7h",
+              "_TZE200_kfvq6avy",
+              "_TZE200_ps5v5jor",
+              "_TZE200_jeaxp72v",
+              "_TZE200_owwdxjbx",
+              "_TZE200_2cs6g9i7",
+              "_TZE200_04yfvweb"})) {
+        createThing(thermostatThingClassId, node);
+        return true;
+    }
+
     return false;
 }
 
@@ -686,6 +722,111 @@ void IntegrationPluginZigbeeTuya::createConnections(Thing *thing)
         }
         connectToIasZoneInputCluster(thing, endpoint, "closed", true);
     }
+
+    if (thing->thingClassId() == thermostatThingClassId) {
+        ZigbeeNodeEndpoint *endpoint = node->getEndpoint(1);
+        if (!endpoint) {
+            qCWarning(dcZigbeeTuya()) << "Unable to find endpoint 1 on node" << node;
+            return;
+        }
+        ZigbeeCluster *cluster = endpoint->getInputCluster(static_cast<ZigbeeClusterLibrary::ClusterId>(CLUSTER_ID_MANUFACTURER_SPECIFIC_TUYA));
+        if (!cluster) {
+            qCWarning(dcZigbeeTuya()) << "Unable to find Tuya manufacturer specific cluuster on endpoint 1 on node" << node;
+            return;
+        }
+
+        if (node->reachable()) {
+            cluster->executeClusterCommand(COMMAND_ID_DATA_QUERY, QByteArray(), ZigbeeClusterLibrary::DirectionClientToServer, true);
+        }
+        connect(node, &ZigbeeNode::reachableChanged, thing, [=](bool reachable){
+            if (reachable) {
+                cluster->executeClusterCommand(COMMAND_ID_DATA_QUERY, QByteArray(), ZigbeeClusterLibrary::DirectionClientToServer, true);
+            }
+        });
+
+        connect(cluster, &ZigbeeCluster::dataIndication, thing, [this, thing](const ZigbeeClusterLibrary::Frame &frame){
+
+            if (frame.header.command == COMMAND_ID_DATA_REPORT || frame.header.command == COMMAND_ID_DATA_RESPONSE) {
+                DpValue dpValue = DpValue::fromData(frame.payload);
+
+                switch (dpValue.dp()) {
+                case THERMOSTAT_DP_HEATING_SETPOINT:
+                    qCDebug(dcZigbeeTuya()) << "Heating setpoint changed:" << dpValue;
+                    thing->setStateValue(thermostatTargetTemperatureStateTypeId, dpValue.value().toUInt() / 10.0);
+                    break;
+                case THERMOSTAT_DP_LOCAL_TEMP:
+                    qCDebug(dcZigbeeTuya()) << "Local temp changed:" << dpValue;
+                    thing->setStateValue(thermostatTemperatureStateTypeId, dpValue.value().toUInt() / 10);
+                    break;
+                case THERMOSTAT_DP_MODE:
+                    qCDebug(dcZigbeeTuya()) << "System mode changed:" << dpValue;
+                    thing->setStateValue(thermostatModeStateTypeId, dpValue.value().toUInt());
+                    break;
+                case THERMOSTAT_DP_CHILD_LOCK:
+                    qCDebug(dcZigbeeTuya()) << "Child lock changed:" << dpValue;
+                    thing->setStateValue(thermostatChildLockStateTypeId, dpValue.value().toUInt() == 1);
+                    break;
+                case THERMOSTAT_DP_WINDOW_OPEN:
+                case THERMOSTAT_DP_WINDOW_OPEN_SITERWELL:
+                    qCDebug(dcZigbeeTuya()) << "Window open changed:" << dpValue;
+                    thing->setStateValue(thermostatWindowOpenStateTypeId, dpValue.value().toUInt() == 0);
+                    break;
+                case THERMOSTAT_DP_WINDOW_DETECTION:
+                    qCDebug(dcZigbeeTuya()) << "Window detection enabled changed:" << dpValue;
+                    thing->setSettingValue(thermostatSettingsWindowDetectionParamTypeId, dpValue.value().toUInt());
+                    break;
+                case THERMOSTAT_DP_TEMP_CALIBRATION:
+                    qCDebug(dcZigbeeTuya()) << "Temp calibration changed:" << dpValue;
+                    thing->setSettingValue(thermostatSettingsTemperatureCalibrationParamTypeId, dpValue.value().toUInt() / 10);
+                    break;
+                case THERMOSTAT_DP_VALVE_OPEN:
+                    qCDebug(dcZigbeeTuya()) << "Valve open changed:" << dpValue;
+                    thing->setStateValue(thermostatHeatingOnStateTypeId, dpValue.value().toUInt() == 1);
+                    break;
+                case THERMOSTAT_DP_BATTERY:
+                    qCDebug(dcZigbeeTuya()) << "Battery changed:" << dpValue;
+                    thing->setStateValue(thermostatBatteryLevelStateTypeId, dpValue.value().toUInt());
+                    break;
+                case THERMOSTAT_DP_BATTERY_LOW:
+                    qCDebug(dcZigbeeTuya()) << "Battery low changed:" << dpValue;
+                    thing->setStateValue(thermostatBatteryCriticalStateTypeId, dpValue.value().toUInt() == 1);
+                    break;
+                default:
+                    qCWarning(dcZigbeeTuya()) << "Unhandled data point" << dpValue;
+                }
+
+                if (frame.header.command == COMMAND_ID_DATA_RESPONSE) {
+                    qCDebug(dcZigbeeTuya()) << "Command response:" << dpValue;;
+                    foreach (ThingActionInfo *info, m_actionQueue.keys()) {
+                        if (info->thing() == thing && m_actionQueue.value(info).dp() == dpValue.dp()) {
+                            qCDebug(dcZigbeeTuya()) << "Finishing action";
+                            info->finish(Thing::ThingErrorNoError);
+                            return;
+                        }
+                    }
+                    qCWarning(dcZigbeeTuya) << "No pending action for command response found!";
+                }
+            } else {
+                qCWarning(dcZigbeeTuya()) << "Unhandled thermostat command:" << frame.header.command;
+            }
+
+
+        });
+
+        connect(thing, &Thing::settingChanged, cluster, [cluster, thing, this](const ParamTypeId &settingTypeId, const QVariant &value) {
+            DpValue dp;
+
+            if (settingTypeId == thermostatSettingsWindowDetectionParamTypeId) {
+                dp = DpValue(THERMOSTAT_DP_WINDOW_DETECTION, DpValue::TypeUInt32, value.toUInt(), m_seq++);
+            }
+            if (settingTypeId == thermostatSettingsTemperatureCalibrationParamTypeId) {
+                dp = DpValue(THERMOSTAT_DP_WINDOW_DETECTION, DpValue::TypeUInt32, value.toDouble() * 10, m_seq++);
+            }
+            qCDebug(dcZigbeeTuya()) << "setting" << thing->thingClass().settingsTypes().findById(settingTypeId).name() << dp << dp.toData().toHex();
+            writeDpDelayed(cluster, dp);
+        });
+
+    }
 }
 
 void IntegrationPluginZigbeeTuya::executeAction(ThingActionInfo *info)
@@ -721,6 +862,38 @@ void IntegrationPluginZigbeeTuya::executeAction(ThingActionInfo *info)
         }
     }
 
+    if (thing->thingClassId() == thermostatThingClassId) {
+        ZigbeeNodeEndpoint *endpoint = node->getEndpoint(0x01);
+        ZigbeeCluster *cluster = endpoint->getInputCluster(static_cast<ZigbeeClusterLibrary::ClusterId>(CLUSTER_ID_MANUFACTURER_SPECIFIC_TUYA));
+        if (!cluster) {
+            qCWarning(dcZigbeeTuya()) << "Unable to find Tuya manufacturer specific cluuster on endpoint 1 on node" << node;
+            info->finish(Thing::ThingErrorHardwareFailure);
+            return;
+        }
+
+        if (info->action().actionTypeId() == thermostatChildLockActionTypeId) {
+            bool locked = info->action().param(thermostatChildLockActionChildLockParamTypeId).value().toBool();
+            DpValue dp = DpValue(THERMOSTAT_DP_CHILD_LOCK, DpValue::TypeBool,locked ? 1 : 0, m_seq++);
+            qCDebug(dcZigbeeTuya()) << "setting child lock:" << dp << dp.toData().toHex();
+            writeDpDelayed(cluster, dp, info);
+            return;
+        }
+        if (info->action().actionTypeId() == thermostatTargetTemperatureActionTypeId) {
+            quint16 heatingSetpoint = info->action().param(thermostatTargetTemperatureActionTargetTemperatureParamTypeId).value().toDouble() * 10;
+            DpValue dp = DpValue(THERMOSTAT_DP_HEATING_SETPOINT, DpValue::TypeUInt32, heatingSetpoint, m_seq++);
+            qCDebug(dcZigbeeTuya()) << "setting heating setpoint:" << dp << dp.toData().toHex();
+            writeDpDelayed(cluster, dp, info);
+            return;
+        }
+        if (info->action().actionTypeId() == thermostatModeActionTypeId) {
+            quint8 mode = info->action().param(thermostatModeActionModeParamTypeId).value().toUInt();
+            DpValue dp = DpValue(THERMOSTAT_DP_MODE, DpValue::TypeUInt32, mode, m_seq++);
+            qCDebug(dcZigbeeTuya()) << "setting mode:" << dp << dp.toData().toHex();
+            writeDpDelayed(cluster, dp, info);
+            return;
+        }
+    }
+
     info->finish(Thing::ThingErrorUnsupportedFeature);
 }
 
@@ -752,7 +925,7 @@ bool IntegrationPluginZigbeeTuya::match(ZigbeeNode *node, const QString &modelNa
     return node->modelName() == modelName && manufacturerNames.contains(node->manufacturerName());
 }
 
-void IntegrationPluginZigbeeTuya::writeDpDelayed(ZigbeeCluster *cluster, const DpValue &dp)
+void IntegrationPluginZigbeeTuya::writeDpDelayed(ZigbeeCluster *cluster, const DpValue &dp, ThingActionInfo *info)
 {
     DelayedDpWrite op;
     op.cluster = cluster;
@@ -761,6 +934,13 @@ void IntegrationPluginZigbeeTuya::writeDpDelayed(ZigbeeCluster *cluster, const D
 
     // Trigger the delayed write asap by trying to read to trigger a lastSeen change
     cluster->executeClusterCommand(COMMAND_ID_DATA_QUERY, QByteArray(), ZigbeeClusterLibrary::DirectionClientToServer, true);
+
+    if (info) {
+        m_actionQueue.insert(info, dp);
+        connect(info, &ThingActionInfo::finished, this, [=](){
+            m_actionQueue.remove(info);
+        });
+    }
 
 }
 

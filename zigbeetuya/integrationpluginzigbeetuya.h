@@ -66,7 +66,7 @@ private slots:
 private:
     bool match(ZigbeeNode *node, const QString &modelName, const QStringList &manufacturerNames);
 
-    void writeDpDelayed(ZigbeeCluster *cluster, const DpValue &dp);
+    void writeDpDelayed(ZigbeeCluster *cluster, const DpValue &dp, ThingActionInfo *info = nullptr);
 
 private:
     struct DelayedDpWrite {
@@ -77,6 +77,7 @@ private:
     PluginTimer *m_energyPollTimer = nullptr;
     quint16 m_seq = 0;
     QList<DelayedDpWrite> m_delayedDpWrites;
+    QHash<ThingActionInfo*, DpValue> m_actionQueue;
 };
 
 #endif // INTEGRATIONPLUGINZIGBEETUYA_H
