@@ -708,7 +708,7 @@ void ZigbeeIntegrationPlugin::connectToThermostatCluster(Thing *thing, ZigbeeNod
     });
 }
 
-void ZigbeeIntegrationPlugin::connectToOnOffInputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, const QString &stateName)
+void ZigbeeIntegrationPlugin::connectToOnOffInputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, const QString &stateName, bool inverted)
 {
     ZigbeeClusterOnOff *onOffCluster = endpoint->inputCluster<ZigbeeClusterOnOff>(ZigbeeClusterLibrary::ClusterIdOnOff);
     if (!onOffCluster) {
@@ -717,11 +717,11 @@ void ZigbeeIntegrationPlugin::connectToOnOffInputCluster(Thing *thing, ZigbeeNod
     }
 
     if (onOffCluster->hasAttribute(ZigbeeClusterOnOff::AttributeOnOff)) {
-        thing->setStateValue(stateName, onOffCluster->power());
+        thing->setStateValue(stateName, inverted ? !onOffCluster->power() : onOffCluster->power());
     }
     onOffCluster->readAttributes({ZigbeeClusterOnOff::AttributeOnOff});
-    connect(onOffCluster, &ZigbeeClusterOnOff::powerChanged, thing, [thing, stateName](bool power){
-        thing->setStateValue(stateName, power);
+    connect(onOffCluster, &ZigbeeClusterOnOff::powerChanged, thing, [thing, stateName, inverted](bool power){
+        thing->setStateValue(stateName, inverted ? !power : power);
     });
 }
 
