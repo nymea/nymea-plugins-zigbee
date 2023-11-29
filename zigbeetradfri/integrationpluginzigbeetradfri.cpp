@@ -628,6 +628,11 @@ void IntegrationPluginZigbeeTradfri::executeAction(ThingActionInfo *info)
             bool power = info->action().paramValue(airPurifierChildLockActionChildLockParamTypeId).toBool();
             record.data = ZigbeeDataType(power).data();
         }
+        if (actionType.id() == airPurifierPerformUpdateActionTypeId) {
+            enableFirmwareUpdate(info->thing());
+            executeImageNotifyOtaOutputCluster(info, endpoint);
+            return;
+        }
 
         ZigbeeClusterReply *reply = airPurifierCluster->writeAttributes({record}, Zigbee::Ikea);
         connect(reply, &ZigbeeClusterReply::finished, this, [reply, info](){
