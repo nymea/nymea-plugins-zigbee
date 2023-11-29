@@ -144,6 +144,14 @@ bool IntegrationPluginZigbeeTradfri::handleNode(ZigbeeNode *node, const QUuid &/
         }
     }
 
+    if (endpoint->profile() == Zigbee::ZigbeeProfileHomeAutomation && endpoint->deviceId() == Zigbee::HomeAutomationDeviceOnOffPlugin) {
+        qCDebug(dcZigbeeTradfri()) << "Handling TRADFRI power socket" << node << endpoint;
+        createThing(powerSocketThingClassId, node);
+        bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdOnOff);
+        configureOnOffInputClusterAttributeReporting(endpoint);
+        return true;
+    }
+
     if (endpoint->profile() == Zigbee::ZigbeeProfileHomeAutomation && endpoint->deviceId() == Zigbee::HomeAutomationDeviceOnOffSensor) {
         qCDebug(dcZigbeeTradfri()) << "Handling TRADFRI motion sensor" << node << endpoint;
         createThing(motionSensorThingClassId, node);
@@ -230,6 +238,11 @@ void IntegrationPluginZigbeeTradfri::createConnections(Thing *thing)
             || thing->thingClassId() == colorLightThingClassId) {
         connectToOnOffInputCluster(thing, endpoint);
         connectToLevelControlInputCluster(thing, endpoint, "brightness");
+        connectToOtaOutputCluster(thing, endpoint);
+    }
+
+    if (thing->thingClassId() == powerSocketThingClassId) {
+        connectToOnOffInputCluster(thing, endpoint);
         connectToOtaOutputCluster(thing, endpoint);
     }
 
