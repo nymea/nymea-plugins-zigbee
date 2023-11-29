@@ -4,7 +4,7 @@ Priority: options
 Maintainer: nymea GmbH <developer@nymea.io>
 Build-depends: debhelper (>= 0.0.0),
                libnymea-dev (>= 0.26~),
-               libnymea-zigbee-dev (>= 1.7~),
+               libnymea-zigbee-dev (>= 1.9~),
                nymea-dev-tools:native,
                pkg-config,
                qtbase5-dev,

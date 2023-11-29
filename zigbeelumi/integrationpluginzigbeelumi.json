@@ -302,7 +302,10 @@
                             "displayNameEvent": "Temperature changed",
                             "type": "double",
                             "unit": "DegreeCelsius",
-                            "defaultValue": 0.0
+                            "defaultValue": 0.0,
+                            "minValue": -50,
+                            "maxValue": 50,
+                            "ioType": "analogInput"
                         },
                         {
                             "id": "27a1e85a-f654-48d8-905d-05b3e2bc499e",
@@ -313,7 +316,8 @@
                             "minValue": 0,
                             "unit": "Percentage",
                             "type": "double",
-                            "defaultValue": 0.0
+                            "defaultValue": 0.0,
+                            "ioType": "analogInput"
                         },
                         {
                             "id": "7c3861f3-a9db-407e-9459-90a511d7f797",
@@ -324,7 +328,8 @@
                             "type": "double",
                             "minValue": 0,
                             "maxValue": 2000,
-                            "defaultValue": 0.0
+                            "defaultValue": 0.0,
+                            "ioType": "analogInput"
                         }
                     ],
                     "actionTypes": [

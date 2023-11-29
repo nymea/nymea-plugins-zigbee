@@ -1296,7 +1296,10 @@
                             "displayNameEvent": "Temperature changed",
                             "type": "double",
                             "unit": "DegreeCelsius",
-                            "defaultValue": 0
+                            "defaultValue": 0,
+                            "minValue": -50,
+                            "maxValue": 50,
+                            "ioType": "analogInput"
                         }
                     ]
                 },
