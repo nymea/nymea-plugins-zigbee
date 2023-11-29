@@ -622,7 +622,7 @@ void IntegrationPluginZigbeeDevelco::executeAction(ThingActionInfo *info)
             }
             uint duration = info->action().paramValue(smokeSensorAlarmActionDurationParamTypeId).toUInt();
             ZigbeeClusterReply *reply = iasWdCluster->startWarning(ZigbeeClusterIasWd::WarningModeFire, true, ZigbeeClusterIasWd::SirenLevelHigh, duration, 50, ZigbeeClusterIasWd::StrobeLevelMedium);
-            connect(reply, &ZigbeeClusterReply::finished, this, [reply, info]() {
+            connect(reply, &ZigbeeClusterReply::finished, info, [reply, info]() {
                 info->finish(reply->error() == ZigbeeClusterReply::ErrorNoError ? Thing::ThingErrorNoError:  Thing::ThingErrorHardwareFailure);
             });
             return;
