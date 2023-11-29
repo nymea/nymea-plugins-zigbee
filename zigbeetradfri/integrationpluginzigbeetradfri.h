@@ -59,6 +59,7 @@ public:
     void thingRemoved(Thing *thing) override;
 
 protected:
+    void createConnections(Thing *thing) override;
     QList<FirmwareIndexEntry> firmwareIndexFromJson(const QByteArray &data) const override;
 
 private slots:

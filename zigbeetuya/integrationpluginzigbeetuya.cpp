@@ -183,7 +183,17 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
         return;
     }
 
+    info->finish(Thing::ThingErrorNoError);
+}
+
+void IntegrationPluginZigbeeTuya::createConnections(Thing *thing)
+{
     ZigbeeNode *node = nodeForThing(thing);
+    if (!node) {
+        qCWarning(dcZigbeeTuya()) << "Node for thing" << thing << "not found.";
+        return;
+    }
+
     ZigbeeNodeEndpoint *endpoint = node->getEndpoint(0x01);
 
     connect(node, &ZigbeeNode::lastSeenChanged, this, [this](){
@@ -336,7 +346,6 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
         ZigbeeNodeEndpoint *endpoint = node->getEndpoint(1);
         if (!endpoint) {
             qCWarning(dcZigbeeTuya()) << "Endpoint 1 not found on" << node;
-            info->finish(Thing::ThingErrorHardwareNotAvailable);
             return;
         }
         ZigbeeClusterIasZone *iasZoneCluster = endpoint->inputCluster<ZigbeeClusterIasZone>(ZigbeeClusterLibrary::ClusterIdIasZone);
@@ -375,13 +384,11 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
         ZigbeeNodeEndpoint *endpoint = node->getEndpoint(1);
         if (!endpoint) {
             qCWarning(dcZigbeeTuya()) << "Unable to find endpoint 1 on node" << node;
-            info->finish(Thing::ThingErrorHardwareNotAvailable, QT_TR_NOOP("Unable to find endpoint 1 on Zigbee node."));
             return;
         }
         ZigbeeCluster *cluster = endpoint->getInputCluster(static_cast<ZigbeeClusterLibrary::ClusterId>(CLUSTER_ID_MANUFACTURER_SPECIFIC_TUYA));
         if (!cluster) {
             qCWarning(dcZigbeeTuya()) << "Unable to find Tuya manufacturer specific cliuster on endpoint 1 on node" << node;
-            info->finish(Thing::ThingErrorHardwareNotAvailable, QT_TR_NOOP("Unable to find Tuya cluster on Zigbee node."));
             return;
         }
 
@@ -442,17 +449,15 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
 
     }
 
-    if (info->thing()->thingClassId() == htlcdSensorThingClassId) {
+    if (thing->thingClassId() == htlcdSensorThingClassId) {
         ZigbeeNodeEndpoint *endpoint = node->getEndpoint(1);
         if (!endpoint) {
             qCWarning(dcZigbeeTuya()) << "Unable to find endpoint 1 on node" << node;
-            info->finish(Thing::ThingErrorHardwareNotAvailable, QT_TR_NOOP("Unable to find endpoint 1 on Zigbee node."));
             return;
         }
         ZigbeeCluster *cluster = endpoint->getInputCluster(static_cast<ZigbeeClusterLibrary::ClusterId>(CLUSTER_ID_MANUFACTURER_SPECIFIC_TUYA));
         if (!cluster) {
             qCWarning(dcZigbeeTuya()) << "Unable to find Tuya manufacturer specific cliuster on endpoint 1 on node" << node;
-            info->finish(Thing::ThingErrorHardwareNotAvailable, QT_TR_NOOP("Unable to find Tuya cluster on Zigbee node."));
             return;
         }
 
@@ -532,17 +537,15 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
 
     }
 
-    if (info->thing()->thingClassId() == airHousekeeperThingClassId) {
+    if (thing->thingClassId() == airHousekeeperThingClassId) {
         ZigbeeNodeEndpoint *endpoint = node->getEndpoint(1);
         if (!endpoint) {
             qCWarning(dcZigbeeTuya()) << "Unable to find endpoint 1 on node" << node;
-            info->finish(Thing::ThingErrorHardwareNotAvailable, QT_TR_NOOP("Unable to find endpoint 1 on Zigbee node."));
             return;
         }
         ZigbeeCluster *cluster = endpoint->getInputCluster(static_cast<ZigbeeClusterLibrary::ClusterId>(CLUSTER_ID_MANUFACTURER_SPECIFIC_TUYA));
         if (!cluster) {
             qCWarning(dcZigbeeTuya()) << "Unable to find Tuya manufacturer specific cluster on endpoint 1 on node" << node;
-            info->finish(Thing::ThingErrorHardwareNotAvailable, QT_TR_NOOP("Unable to find Tuya cluster on Zigbee node."));
             return;
         }
 
@@ -600,17 +603,15 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
         });
     }
 
-    if (info->thing()->thingClassId() == smokeSensorThingClassId) {
+    if (thing->thingClassId() == smokeSensorThingClassId) {
         ZigbeeNodeEndpoint *endpoint = node->getEndpoint(1);
         if (!endpoint) {
             qCWarning(dcZigbeeTuya()) << "Unable to find endpoint 1 on node" << node;
-            info->finish(Thing::ThingErrorHardwareNotAvailable, QT_TR_NOOP("Unable to find endpoint 1 on Zigbee node."));
             return;
         }
         ZigbeeCluster *cluster = endpoint->getInputCluster(static_cast<ZigbeeClusterLibrary::ClusterId>(CLUSTER_ID_MANUFACTURER_SPECIFIC_TUYA));
         if (!cluster) {
             qCWarning(dcZigbeeTuya()) << "Unable to find Tuya manufacturer specific cluuster on endpoint 1 on node" << node;
-            info->finish(Thing::ThingErrorHardwareNotAvailable, QT_TR_NOOP("Unable to find Tuya cluster on Zigbee node."));
             return;
         }
 
@@ -666,8 +667,6 @@ void IntegrationPluginZigbeeTuya::setupThing(ThingSetupInfo *info)
 
         });
     }
-
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeeTuya::executeAction(ThingActionInfo *info)
@@ -679,7 +678,7 @@ void IntegrationPluginZigbeeTuya::executeAction(ThingActionInfo *info)
 
     Thing *thing = info->thing();
     ZigbeeNode *node = nodeForThing(info->thing());
-    if (!node->reachable()) {
+    if (!node || !node->reachable()) {
         info->finish(Thing::ThingErrorHardwareNotAvailable);
         return;
     }
@@ -719,6 +718,10 @@ void IntegrationPluginZigbeeTuya::pollEnergyMeters()
 {
     foreach (Thing *thing, myThings().filterByThingClassId(powerSocketThingClassId)) {
         ZigbeeNode *node = nodeForThing(thing);
+        if (!node) {
+            qCDebug(dcZigbeeTuya()) << "Node for thing" << thing << "not found. Cannot poll energy meter.";
+            continue;
+        }
         ZigbeeNodeEndpoint *endpoint = node->getEndpoint(0x01);
         ZigbeeClusterMetering *meteringCluster = endpoint->inputCluster<ZigbeeClusterMetering>(ZigbeeClusterLibrary::ClusterIdMetering);
         meteringCluster->readAttributes({ZigbeeClusterMetering::AttributeCurrentSummationDelivered});

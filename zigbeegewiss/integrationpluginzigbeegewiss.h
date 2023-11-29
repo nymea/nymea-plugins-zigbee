@@ -54,6 +54,8 @@ public:
     void executeAction(ThingActionInfo *info) override;
 
 private:
+    void createConnections(Thing *thing) override;
+
     bool initTemperatureCluster(ZigbeeNode *node, Thing *thing);
 
     void connectToOnOffOutputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, const QString &toggleButton, const QString &onButton, const QString &offButton, const QString &powerStateName);

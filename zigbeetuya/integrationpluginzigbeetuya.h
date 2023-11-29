@@ -57,6 +57,9 @@ public:
     void executeAction(ThingActionInfo *info) override;
     void thingRemoved(Thing *thing) override;
 
+protected:
+    void createConnections(Thing *thing) override;
+
 private slots:
     void pollEnergyMeters();
 

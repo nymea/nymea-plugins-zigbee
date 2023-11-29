@@ -100,6 +100,8 @@ public:
     void executeAction(ThingActionInfo *info) override;
 
 private:    
+    void createConnections(Thing *thing) override;
+
     QString parseDevelcoVersionString(ZigbeeNodeEndpoint *endpoint);
 
     void initIoModule(ZigbeeNode *node);

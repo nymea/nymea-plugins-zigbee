@@ -55,6 +55,10 @@ public:
 
     void setupThing(ThingSetupInfo *info) override;
     void executeAction(ThingActionInfo *info) override;
+
+private:
+    void createConnections(Thing *thing) override;
+
 };
 
 #endif // INTEGRATIONPLUGINZIGBEEJUNG_H

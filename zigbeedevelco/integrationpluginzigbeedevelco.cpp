@@ -173,14 +173,23 @@ void IntegrationPluginZigbeeDevelco::setupThing(ThingSetupInfo *info)
         info->finish(Thing::ThingErrorHardwareNotAvailable);
         return;
     }
+
+    info->finish(Thing::ThingErrorNoError);
+}
+
+void IntegrationPluginZigbeeDevelco::createConnections(Thing *thing)
+{
     ZigbeeNode *node = nodeForThing(thing);
+    if (!node) {
+        qCWarning(dcZigbeeDevelco()) << "Node for thing" << thing << "not found.";
+        return;
+    }
 
     if (thing->thingClassId() == ioModuleThingClassId) {
         // Set the version from the manufacturer specific attribute in base cluster
         ZigbeeNodeEndpoint *primaryEndpoint = node->getEndpoint(IO_MODULE_EP_INPUT1);
         if (!primaryEndpoint) {
             qCWarning(dcZigbeeDevelco()) << "Failed to set up IO module" << thing << ". Could not find endpoint for version parsing.";
-            info->finish(Thing::ThingErrorSetupFailed);
             return;
         }
 
@@ -326,7 +335,6 @@ void IntegrationPluginZigbeeDevelco::setupThing(ThingSetupInfo *info)
         ZigbeeNodeEndpoint *sensorEndpoint = node->getEndpoint(DEVELCO_EP_TEMPERATURE_SENSOR);
         if (!sensorEndpoint) {
             qCWarning(dcZigbeeDevelco()) << "Failed to set up air quality sensor" << thing << ". Could not find endpoint for version parsing.";
-            info->finish(Thing::ThingErrorSetupFailed);
             return;
         }
 
@@ -430,14 +438,13 @@ void IntegrationPluginZigbeeDevelco::setupThing(ThingSetupInfo *info)
         connectToTemperatureMeasurementInputCluster(thing, temperatureSensorEndpoint);
         connectToIlluminanceMeasurementInputCluster(thing, illuminanceSensorEndpoint);
     }
-
-    info->finish(Thing::ThingErrorNoError);
 }
 
 void IntegrationPluginZigbeeDevelco::postSetupThing(Thing *thing)
 {
     if (thing->thingClassId() == ioModuleThingClassId) {
-        if (nodeForThing(thing)->reachable()) {
+        ZigbeeNode *node = nodeForThing(thing);
+        if (node && node->reachable()) {
             readIoModuleOutputPowerStates(thing);
             readIoModuleInputPowerStates(thing);
         }
@@ -453,6 +460,11 @@ void IntegrationPluginZigbeeDevelco::executeAction(ThingActionInfo *info)
 
     Thing *thing = info->thing();
     ZigbeeNode *node = nodeForThing(info->thing());
+    if (!node) {
+        qCWarning(dcZigbeeDevelco()) << "Node for thing" << thing << "not found.";
+        info->finish(Thing::ThingErrorHardwareNotAvailable);
+        return;
+    }
 
     if (thing->thingClassId() == ioModuleThingClassId) {
         // Identify

@@ -95,7 +95,16 @@ void IntegrationPluginZigbeeSchneiderElectric::setupThing(ThingSetupInfo *info)
         return;
     }
 
+    info->finish(Thing::ThingErrorNoError);
+}
+
+void IntegrationPluginZigbeeSchneiderElectric::createConnections(Thing *thing)
+{
     ZigbeeNode *node = nodeForThing(thing);
+    if (!node) {
+        qCWarning(dcZigbeeSchneiderElectric()) << "Node for thing" << thing << "not found.";
+        return;
+    }
 
 
     if (thing->thingClassId() == flsAirlink4ThingClassId) {
@@ -105,7 +114,6 @@ void IntegrationPluginZigbeeSchneiderElectric::setupThing(ThingSetupInfo *info)
 
         if (!endpoint21 || !endpoint22) {
             qCWarning(dcZigbeeSchneiderElectric()) << "Unable to get endpoints from device.";
-            info->finish(Thing::ThingErrorHardwareFailure);
             return;
         }
 
@@ -115,11 +123,6 @@ void IntegrationPluginZigbeeSchneiderElectric::setupThing(ThingSetupInfo *info)
         connectToOnOffOutputCluster(thing, endpoint22, "Bottom on", "Bottom off");
         connectToLevelControlOutputCluster(thing, endpoint22, "Bottom up", "Bottom down");
 
-        info->finish(Thing::ThingErrorNoError);
         return;
     }
-
-    qCWarning(dcZigbeeSchneiderElectric()) << "Thing class not found" << info->thing()->thingClassId();
-    Q_ASSERT_X(false, "ZigbeeSchneiderElectric", "Unhandled thing class");
-    return info->finish(Thing::ThingErrorThingClassNotFound);
 }

@@ -61,8 +61,8 @@ protected:
 private:
     ZigbeeNodeEndpoint *findEndpoint(Thing *thing);
 
-    void initSimplePowerSocket(ZigbeeNode *node, ZigbeeNodeEndpoint *endpoint);
-    void initDoorLock(ZigbeeNode *node, ZigbeeNodeEndpoint *endpoint);
+    void createConnections(Thing *thing) override;
+
 };
 
 #endif // INTEGRATIONPLUGINZIGBEEGENERIC_H
