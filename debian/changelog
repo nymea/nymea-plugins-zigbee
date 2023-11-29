@@ -1,3 +1,21 @@
+nymea-plugins-zigbee (1.9.0) jammy; urgency=medium
+
+  [ Michael Zanetti ]
+  * More debugs
+  * Don't destroy things when removing ZigBee nodes from the network
+  * Tradfri: Fix OTA update action for Starkvind purifier
+  * Develco: Add support for OTA upgrades
+  * Develco: Fix a crash when the smoke sensor alarm action times out
+  * Philipshue: Fix a crash when changing the settings of the Wall
+    switch module
+  * Tradfri: Add tradfri powersocket
+  * Develco: Add power socket
+  * Add min/max temperture handling to temperature sensors
+  * Tuya: Add support for tuya closable sensors
+  * Lumi: Add battery handling to some more lumi devices
+
+ -- jenkins <developer@nymea.io>  Wed, 29 Nov 2023 14:14:14 +0100
+
 nymea-plugins-zigbee (1.8.4) jammy; urgency=medium
 
 
