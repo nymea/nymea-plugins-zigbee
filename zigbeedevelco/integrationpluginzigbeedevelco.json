@@ -796,6 +796,123 @@
                             "displayName": "Start update"
                         }
                     ]
+                },
+                {
+                    "name": "powerSocket",
+                    "displayName": "Power socket",
+                    "id": "e0ac647a-34a2-40ee-b8a3-8da6668f8a35",
+                    "setupMethod": "JustAdd",
+                    "createMethods": [ "auto" ],
+                    "interfaces": [ "powersocket", "smartmeterconsumer", "wirelessconnectable", "update" ],
+                    "paramTypes": [
+                        {
+                            "id": "fcae0df4-a165-4f52-9b8b-09c63b4aa917",
+                            "name": "ieeeAddress",
+                            "displayName": "IEEE adress",
+                            "type": "QString",
+                            "defaultValue": "00:00:00:00:00:00:00:00"
+                        },
+                        {
+                            "id": "f07843ce-8d9f-4336-b253-742b0cb210cb",
+                            "name": "networkUuid",
+                            "displayName": "Zigbee network UUID",
+                            "type": "QString",
+                            "defaultValue": ""
+                        }
+                    ],
+                    "stateTypes": [
+                        {
+                            "id": "8ffdef7e-138b-4671-9309-ce81f2f9b818",
+                            "name": "connected",
+                            "displayName": "Connected",
+                            "displayNameEvent": "Connected changed",
+                            "type": "bool",
+                            "cached": false,
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "e4448f7c-719f-4ece-abb6-05b4e8b7a262",
+                            "name": "signalStrength",
+                            "displayName": "Signal strength",
+                            "displayNameEvent": "Signal strength changed",
+                            "defaultValue": 0,
+                            "maxValue": 100,
+                            "minValue": 0,
+                            "type": "uint",
+                            "unit": "Percentage"
+                        },
+                        {
+                            "id": "b89f9bf8-59eb-4d04-8f93-eef4b8d88989",
+                            "name": "power",
+                            "displayName": "Power",
+                            "displayNameEvent": "Power changed",
+                            "displayNameAction": "Set power",
+                            "type": "bool",
+                            "defaultValue": false,
+                            "writable": true,
+                            "ioType": "digitalOutput"
+                        },
+                        {
+                            "id": "97836b20-dc36-418f-b2af-74b71c6b27f3",
+                            "name": "currentPower",
+                            "displayName": "Current power consumption",
+                            "displayNameEvent": "Current power consumption changed",
+                            "type": "double",
+                            "unit": "Watt",
+                            "defaultValue": 0,
+                            "cached": false
+                        },
+                        {
+                            "id": "6ae69f17-7fcd-4cb3-a071-ff48ebb720ff",
+                            "name": "totalEnergyConsumed",
+                            "displayName": "Total consumed energy",
+                            "displayNameEvent": "Total energy consumed changed",
+                            "type": "double",
+                            "unit": "KiloWattHour",
+                            "defaultValue": 0
+                        },
+                        {
+                            "id": "1dc9223c-7d23-40b1-b46a-21eecd817ea4",
+                            "name": "currentVersion",
+                            "displayName": "Version",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "140b1a2c-d4da-48fc-bc82-80e2b17a1534",
+                            "name": "availableVersion",
+                            "displayName": "Available firmware version",
+                            "type": "QString",
+                            "defaultValue": ""
+                        },
+                        {
+                            "id": "07eece60-8b52-4a92-9f06-be2dc19145e5",
+                            "name": "updateStatus",
+                            "displayName": "Update status",
+                            "type": "QString",
+                            "possibleValues": ["idle", "available", "updating"],
+                            "defaultValue": "idle",
+                            "cached": false
+                        },
+                        {
+                            "id": "36bd5cea-a38a-4b9a-8ee3-272558788f70",
+                            "name": "updateProgress",
+                            "displayName": "Update progress",
+                            "type": "uint",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "unit": "Percentage",
+                            "defaultValue": 0,
+                            "cached": false
+                        }
+                    ],
+                    "actionTypes": [
+                        {
+                            "id": "ecef7366-d925-4e44-8757-d39b546c1744",
+                            "name": "performUpdate",
+                            "displayName": "Start update"
+                        }
+                    ]
                 }
             ]
         }
