@@ -9,5 +9,8 @@
     ],
     "categories": [
         "socket",
+        "sensor",
+        "door",
+        "energy"
     ]
 }

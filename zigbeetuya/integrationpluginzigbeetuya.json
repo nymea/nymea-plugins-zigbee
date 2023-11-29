@@ -703,6 +703,86 @@
                             "defaultValue": false
                         }
                     ]
+                },
+                {
+                    "id": "82a859f0-41ed-4a53-93b0-260a1435ac75",
+                    "name": "closableSensor",
+                    "displayName": "Door/window sensor",
+                    "createMethods": ["auto"],
+                    "interfaces": ["closablesensor", "battery", "wirelessconnectable"],
+                    "paramTypes": [
+                        {
+                            "id": "06a60993-2ce7-484d-9ffd-13020be8fa78",
+                            "name": "ieeeAddress",
+                            "displayName": "IEEE adress",
+                            "type": "QString",
+                            "defaultValue": "00:00:00:00:00:00:00:00"
+                        },
+                        {
+                            "id": "7850cdee-7d65-48f9-a08a-4cabe9c20594",
+                            "name": "networkUuid",
+                            "displayName": "Zigbee network UUID",
+                            "type": "QString",
+                            "defaultValue": ""
+                        }
+                    ],
+                    "stateTypes": [
+                        {
+                            "id": "6d4523c2-66f1-4fbf-b0d9-bd11a1920b50",
+                            "name": "closed",
+                            "displayName": "Closed",
+                            "displayNameEvent": "Opened or closed",
+                            "type": "bool",
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "948bc2da-23fb-44fd-a74c-c917bf657bf0",
+                            "name": "tampered",
+                            "displayName": "Tampered",
+                            "displayNameEvent": "Tampered",
+                            "type": "bool",
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "34a8f7f1-19f8-47be-a1b2-4d7ea52fee1e",
+                            "name": "batteryLevel",
+                            "displayName": "Battery level",
+                            "displayNameEvent": "Battery level changed",
+                            "type": "int",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "unit": "Percentage",
+                            "defaultValue": 50
+                        },
+                        {
+                            "id": "455e1ebc-5534-4053-8db3-c0b6b79f8c41",
+                            "name": "batteryCritical",
+                            "displayName": "Battery critical",
+                            "displayNameEvent": "Battery critical changed",
+                            "type": "bool",
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "10d8aa94-943e-40f6-a10e-0ac77bcdecd3",
+                            "name": "connected",
+                            "displayName": "Connected",
+                            "displayNameEvent": "Connected or disconnected",
+                            "type": "bool",
+                            "defaultValue": false,
+                            "cached": false
+                        },
+                        {
+                            "id": "4ef57e47-2b83-4d41-8cfb-21bf2f5ee62d",
+                            "name": "signalStrength",
+                            "displayName": "Signal strength",
+                            "displayNameEvent": "Signal strength changed",
+                            "type": "uint",
+                            "minValue": 0,
+                            "maxValue": 100,
+                            "unit": "Percentage",
+                            "defaultValue": 0
+                        }
+                    ]
                 }
             ]
         }
