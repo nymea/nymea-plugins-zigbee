@@ -100,7 +100,7 @@ protected:
 
     void connectToPowerConfigurationInputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, qreal maxVoltage = 0, qreal minVoltage = 0);
     void connectToThermostatCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint);
-    void connectToOnOffInputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, const QString &stateName = "power");
+    void connectToOnOffInputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, const QString &stateName = "power", bool inverted = false);
     void connectToOnOffOutputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, const QString &onButtonName = "ON", const QString &offButtonName = "OFF", const QString &toggleButtonName = "TOGGLE");
     void connectToLevelControlInputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, const QString &stateName);
     void connectToLevelControlOutputCluster(Thing *thing, ZigbeeNodeEndpoint *endpoint, const QString &buttonUp = "UP", const QString &buttonDown = "DOWN");

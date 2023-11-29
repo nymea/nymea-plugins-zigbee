@@ -183,6 +183,7 @@ void IntegrationPluginZigbeeLumi::createConnections(Thing *thing)
 
     // Thing specific setup
     if (thing->thingClassId() == lumiMagnetSensorThingClassId) {
+        connectToPowerConfigurationInputCluster(thing, endpoint, 3, 2.85);
         ZigbeeClusterOnOff *onOffCluster = endpoint->inputCluster<ZigbeeClusterOnOff>(ZigbeeClusterLibrary::ClusterIdOnOff);
         if (onOffCluster) {
             // Only set the state if the cluster actually has the attribute
@@ -328,6 +329,7 @@ void IntegrationPluginZigbeeLumi::createConnections(Thing *thing)
     }
 
     if (thing->thingClassId() == lumiHTSensorThingClassId) {
+        connectToPowerConfigurationInputCluster(thing, endpoint, 3, 2.85);
         connectToTemperatureMeasurementInputCluster(thing, endpoint);
         connectToRelativeHumidityMeasurementInputCluster(thing, endpoint);
     }
@@ -425,6 +427,7 @@ void IntegrationPluginZigbeeLumi::createConnections(Thing *thing)
 
     if (thing->thingClassId() == lumiWeatherSensorThingClassId) {
         connectToTemperatureMeasurementInputCluster(thing, endpoint);
+        connectToPowerConfigurationInputCluster(thing, endpoint, 3, 2.85);
         connectToRelativeHumidityMeasurementInputCluster(thing, endpoint);
 
         ZigbeeClusterPressureMeasurement *pressureCluster = endpoint->inputCluster<ZigbeeClusterPressureMeasurement>(ZigbeeClusterLibrary::ClusterIdPressureMeasurement);

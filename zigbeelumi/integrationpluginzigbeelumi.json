@@ -14,7 +14,7 @@
                     "id": "dfabab0e-d483-43f8-82c6-720899e70c86",
                     "setupMethod": "JustAdd",
                     "createMethods": [ "Auto" ],
-                    "interfaces": [ "temperaturesensor", "humiditysensor", "wirelessconnectable" ],
+                    "interfaces": [ "temperaturesensor", "humiditysensor", "wirelessconnectable", "battery" ],
                     "paramTypes": [
                         {
                             "id": "bd0b2bf2-2ec3-497f-9679-a63850101257",
@@ -80,6 +80,23 @@
                             "unit": "Percentage",
                             "type": "double",
                             "defaultValue": 0.0
+                        },
+                        {
+                            "id": "4091259a-f1db-435e-9296-9eeb17b6f835",
+                            "name": "batteryLevel",
+                            "displayName": "Battery level",
+                            "type": "int",
+                            "unit": "Percentage",
+                            "maxValue": 100,
+                            "minValue": 0,
+                            "defaultValue": 100
+                        },
+                        {
+                            "id": "2c59a1f8-f33e-4dab-83fe-46b95d107fed",
+                            "name": "batteryCritical",
+                            "displayName": "Battery level critical",
+                            "type": "bool",
+                            "defaultValue": false
                         }
                     ],
                     "actionTypes": [
@@ -248,7 +265,7 @@
                     "id": "0b582616-0b05-4ac9-8b59-51b66079b571",
                     "setupMethod": "JustAdd",
                     "createMethods": [ "Auto" ],
-                    "interfaces": [ "pressuresensor", "temperaturesensor", "humiditysensor", "wirelessconnectable" ],
+                    "interfaces": [ "pressuresensor", "temperaturesensor", "humiditysensor", "wirelessconnectable", "battery" ],
                     "paramTypes": [
                         {
                             "id": "ef1129e2-bdf8-423e-9c11-fa8b406f960b",
@@ -329,7 +346,25 @@
                             "minValue": 0,
                             "maxValue": 2000,
                             "defaultValue": 0.0,
-                            "ioType": "analogInput"
+                            "ioType": "analogInput",
+                            "defaultValue": 0.0
+                        },
+                        {
+                            "id": "706eb697-4265-440d-a79a-11df3f6db335",
+                            "name": "batteryLevel",
+                            "displayName": "Battery level",
+                            "type": "int",
+                            "unit": "Percentage",
+                            "maxValue": 100,
+                            "minValue": 0,
+                            "defaultValue": 100
+                        },
+                        {
+                            "id": "dc419970-7bb4-404f-8146-232b46668778",
+                            "name": "batteryCritical",
+                            "displayName": "Battery level critical",
+                            "type": "bool",
+                            "defaultValue": false
                         }
                     ],
                     "actionTypes": [
@@ -345,7 +380,7 @@
                     "id": "b3e30f37-7467-4c66-8694-9fe624aebd10",
                     "setupMethod": "JustAdd",
                     "createMethods": [ "Auto" ],
-                    "interfaces": [ "closablesensor", "wirelessconnectable" ],
+                    "interfaces": [ "closablesensor", "wirelessconnectable", "battery" ],
                     "paramTypes": [
                         {
                             "id": "36d8a40a-7f37-4d59-a0d9-6d4977ea63f3",
@@ -400,6 +435,23 @@
                             "type": "bool",
                             "defaultValue": true,
                             "ioType": "digitalInput"
+                        },
+                        {
+                            "id": "c2dbbf61-109d-4267-a9ad-904bc0f3e8ca",
+                            "name": "batteryLevel",
+                            "displayName": "Battery level",
+                            "type": "int",
+                            "unit": "Percentage",
+                            "maxValue": 100,
+                            "minValue": 0,
+                            "defaultValue": 100
+                        },
+                        {
+                            "id": "da0cb4d6-4d72-4163-93fe-a63cabf1adf0",
+                            "name": "batteryCritical",
+                            "displayName": "Battery level critical",
+                            "type": "bool",
+                            "defaultValue": false
                         }
                     ],
                     "actionTypes": [
