@@ -46,6 +46,7 @@ class IntegrationPluginZigbeePhilipsHue: public ZigbeeIntegrationPlugin
 public:
     explicit IntegrationPluginZigbeePhilipsHue();
 
+    void init() override;
     QString name() const override;
     bool handleNode(ZigbeeNode *node, const QUuid &networkUuid) override;
 

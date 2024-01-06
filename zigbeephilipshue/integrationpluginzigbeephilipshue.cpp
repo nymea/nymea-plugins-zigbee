@@ -44,9 +44,50 @@
 
 #include <math.h>
 
+#include <QSslCertificate>
+#include <QSslSocket>
+
+
 IntegrationPluginZigbeePhilipsHue::IntegrationPluginZigbeePhilipsHue():
     ZigbeeIntegrationPlugin(ZigbeeHardwareResource::HandlerTypeVendor, dcZigbeePhilipsHue())
 {
+}
+
+void IntegrationPluginZigbeePhilipsHue::init()
+{
+    ZigbeeIntegrationPlugin::init();
+
+    // Hue servers started to use a self signed certificate for their firmware update server
+    // See: https://github.com/Koenkk/zigbee-OTA/issues/420
+    QByteArray cacertsData = "-----BEGIN CERTIFICATE-----\n"
+            "MIIBwDCCAWagAwIBAgIJAJtrMkoTxs+WMAoGCCqGSM49BAMCMDIxCzAJBgNVBAYT\n"
+            "Ak5MMRQwEgYDVQQKDAtQaGlsaXBzIEh1ZTENMAsGA1UEAwwEcm9vdDAgFw0xNjA4\n"
+            "MjUwNzU5NDNaGA8yMDY4MDEwNTA3NTk0M1owMjELMAkGA1UEBhMCTkwxFDASBgNV\n"
+            "BAoMC1BoaWxpcHMgSHVlMQ0wCwYDVQQDDARyb290MFkwEwYHKoZIzj0CAQYIKoZI\n"
+            "zj0DAQcDQgAEENC1JOl6BxJrwCb+YK655zlM57VKFSi5OHDsmlCaF/EfTGGgU08/\n"
+            "JUtkCyMlHUUoYBZyzCBKXqRKkrT512evEKNjMGEwHQYDVR0OBBYEFAlkFYACVzir\n"
+            "qTr++cWia8AKH/fOMB8GA1UdIwQYMBaAFAlkFYACVzirqTr++cWia8AKH/fOMA8G\n"
+            "A1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgGGMAoGCCqGSM49BAMCA0gAMEUC\n"
+            "IQDcGfyXaUl5hjr5YE8m2piXhMcDzHTNbO1RvGgz4r9IswIgFTTw/R85KyfIiW+E\n"
+            "clwJRVSsq8EApeFREenCkRM0EIk=\n"
+            "-----END CERTIFICATE-----\n"
+            "-----BEGIN CERTIFICATE-----\n"
+            "MIIBwDCCAWagAwIBAgIJAJtrMkoTxs+WMAoGCCqGSM49BAMCMDIxCzAJBgNVBAYT\n"
+            "Ak5MMRQwEgYDVQQKDAtQaGlsaXBzIEh1ZTENMAsGA1UEAwwEcm9vdDAgFw0xNjA4\n"
+            "MjUwNzU5NDNaGA8yMDY4MDEwNTA3NTk0M1owMjELMAkGA1UEBhMCTkwxFDASBgNV\n"
+            "BAoMC1BoaWxpcHMgSHVlMQ0wCwYDVQQDDARyb290MFkwEwYHKoZIzj0CAQYIKoZI\n"
+            "zj0DAQcDQgAEENC1JOl6BxJrwCb+YK655zlM57VKFSi5OHDsmlCaF/EfTGGgU08/\n"
+            "JUtkCyMlHUUoYBZyzCBKXqRKkrT512evEKNjMGEwHQYDVR0OBBYEFAlkFYACVzir\n"
+            "qTr++cWia8AKH/fOMB8GA1UdIwQYMBaAFAlkFYACVzirqTr++cWia8AKH/fOMA8G\n"
+            "A1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgGGMAoGCCqGSM49BAMCA0gAMEUC\n"
+            "IQDcGfyXaUl5hjr5YE8m2piXhMcDzHTNbO1RvGgz4r9IswIgFTTw/R85KyfIiW+E\n"
+            "clwJRVSsq8EApeFREenCkRM0EIk=\n"
+            "-----END CERTIFICATE-----\n";
+
+    foreach (const QSslCertificate &cert, QSslCertificate::fromData(cacertsData)) {
+        qCDebug(dcZigbeePhilipsHue()) << "Adding certificate for firmware server:" << cert;
+        QSslSocket::addDefaultCaCertificate(cert);
+    }
 }
 
 QString IntegrationPluginZigbeePhilipsHue::name() const

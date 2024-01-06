@@ -65,7 +65,6 @@ ZigbeeIntegrationPlugin::ZigbeeIntegrationPlugin(ZigbeeHardwareResource::Handler
     m_handlerType(handlerType),
     m_dc(loggingCategory.categoryName())
 {
-
 }
 
 ZigbeeIntegrationPlugin::~ZigbeeIntegrationPlugin()
@@ -1657,6 +1656,7 @@ void ZigbeeIntegrationPlugin::updateFirmwareIndex()
     }
 
     if (m_lastFirmwareIndexUpdate.addDays(1) > QDateTime::currentDateTime()) {
+        qCDebug(m_dc) << "Firmware index is up to date";
         return;
     }
     QNetworkRequest request(m_firmwareIndexUrl);
@@ -1682,6 +1682,7 @@ void ZigbeeIntegrationPlugin::updateFirmwareIndex()
             qCWarning(m_dc) << "Unable to open cache file for writing" << cacheFileInfo.absoluteFilePath();
             return;
         }
+        qCDebug(m_dc) << "Firmware index fetched";
         cache.write(data);
         cache.close();
     });
@@ -1759,9 +1760,14 @@ FetchFirmwareReply *ZigbeeIntegrationPlugin::fetchFirmware(const ZigbeeIntegrati
     QNetworkReply *networkReply = hardwareManager()->networkManager()->get(request);
 
     connect(networkReply, &QNetworkReply::finished, networkReply, &QNetworkReply::deleteLater);
+    connect(networkReply, &QNetworkReply::sslErrors, this, [this](const QList<QSslError> &errors){
+        foreach (const QSslError &error, errors) {
+            qCWarning(m_dc) << "SSL error:" << error;
+        }
+    });
     connect(networkReply, &QNetworkReply::finished, this, [=](){
         if (networkReply->error() != QNetworkReply::NoError) {
-            qCWarning(m_dc) << "Error downloading firmware" << info.url.toString();
+            qCWarning(m_dc) << "Error downloading firmware" << info.url.toString() << networkReply->errorString();
             emit reply->finished();
             return;
         }
@@ -1796,6 +1802,7 @@ FetchFirmwareReply *ZigbeeIntegrationPlugin::fetchFirmware(const ZigbeeIntegrati
         }
         file.write(data);
         file.close();
+        qCDebug(m_dc) << "Firmware file downloaded successfully:" << fileInfo.absoluteFilePath();
         emit reply->finished();
     });
     return reply;
