@@ -1,3 +1,10 @@
+nymea-plugins-zigbee (1.9.1) jammy; urgency=medium
+
+  [ Michael Zanetti ]
+  * ZigbeePhilipsHue: Fix downloading hue firmware files
+
+ -- jenkins <developer@nymea.io>  Mon, 08 Jan 2024 10:05:12 +0100
+
 nymea-plugins-zigbee (1.9.0) jammy; urgency=medium
 
   [ Michael Zanetti ]
