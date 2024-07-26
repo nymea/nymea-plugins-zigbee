@@ -1,3 +1,10 @@
+nymea-plugins-zigbee (1.10.0) jammy; urgency=medium
+
+  [ Michael Zanetti ]
+  * WIP: Tuya: Add thermostat support
+
+ -- jenkins <developer@nymea.io>  Fri, 26 Jul 2024 15:39:13 +0200
+
 nymea-plugins-zigbee (1.9.3) jammy; urgency=medium
 
   [ Simon Stürz ]
