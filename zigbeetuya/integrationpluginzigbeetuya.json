@@ -783,6 +783,148 @@
                             "defaultValue": 0
                         }
                     ]
+                },
+                {
+                    "id": "51cf21ce-28a0-4b48-851b-d27a18d00b9c",
+                    "name": "thermostat",
+                    "displayName": "Thermostat",
+                    "createMethods": [ "auto" ],
+                    "interfaces": ["thermostat", "temperaturesensor", "battery", "childlock", "wirelessconnectable"],
+                    "paramTypes": [
+                        {
+                            "id": "2c562d32-0351-4f39-9d33-178817a9d413",
+                            "name": "ieeeAddress",
+                            "displayName": "IEEE adress",
+                            "type": "QString",
+                            "defaultValue": "00:00:00:00:00:00:00:00"
+                        },
+                        {
+                            "id": "35aa5409-43b9-4f66-bb22-225f226427d5",
+                            "name": "networkUuid",
+                            "displayName": "Zigbee network UUID",
+                            "type": "QString",
+                            "defaultValue": ""
+                        }
+                    ],
+                    "settingsTypes": [
+                        {
+                            "id": "df9414af-9db3-4ee0-bf31-ff832b437324",
+                            "name": "windowDetection",
+                            "displayName": "Window open detection",
+                            "type": "bool",
+                            "defaultValue": true
+                        },
+                        {
+                            "id": "c94e536e-7bb4-4e66-906f-a370783011d8",
+                            "name": "temperatureCalibration",
+                            "displayName": "Temperature calibration offset",
+                            "type": "double",
+                            "defaultValue": 0
+                        }
+                    ],
+                    "stateTypes": [
+                        {
+                            "id": "08e33c27-54cb-4270-a82d-a2b24bea8c45",
+                            "name": "targetTemperature",
+                            "displayName": "Target temperature",
+                            "displayNameAction": "Set target temperature",
+                            "type": "double",
+                            "unit": "DegreeCelsius",
+                            "minValue": 7,
+                            "maxValue": 30,
+                            "defaultValue": 0,
+                            "writable": true
+                        },
+                        {
+                            "id": "6db38434-4f6c-4326-a4c1-deb3868cc402",
+                            "name": "temperature",
+                            "displayName": "Current temperature",
+                            "type": "double",
+                            "unit": "DegreeCelsius",
+                            "defaultValue": 0
+                        },
+                        {
+                            "id": "fb58531f-c650-486c-bef7-b1a63073c681",
+                            "name": "heatingOn",
+                            "displayName": "Heating on",
+                            "type": "bool",
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "31e58198-a7c0-4866-9aac-6cac3a07fdb9",
+                            "name": "connected",
+                            "displayName": "Connected",
+                            "type": "bool",
+                            "cached": false,
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "95e83e40-5f85-41cf-9f22-060bec40392d",
+                            "name": "signalStrength",
+                            "displayName": "Signal strength",
+                            "defaultValue": 0,
+                            "maxValue": 100,
+                            "minValue": 0,
+                            "type": "uint",
+                            "unit": "Percentage"
+                        },
+                        {
+                            "id": "97c0b335-b29f-4297-9039-44ac612dabfb",
+                            "name": "batteryLevel",
+                            "displayName": "Battery level",
+                            "type": "int",
+                            "unit": "Percentage",
+                            "defaultValue": 50,
+                            "minValue": 0,
+                            "maxValue": 100
+                        },
+                        {
+                            "id": "21564d78-d28c-47f2-8e67-5a6330df4bef",
+                            "name": "batteryCritical",
+                            "displayName": "Battery critical",
+                            "type": "bool",
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "81d70a7c-2151-4354-b81e-cf406cf72979",
+                            "name": "windowOpen",
+                            "displayName": "Window open",
+                            "type": "bool",
+                            "defaultValue": false
+                        },
+                        {
+                            "id": "2db4b96b-8892-4864-af6a-3d40c296fb6f",
+                            "name": "childLock",
+                            "displayName": "Child protection lock",
+                            "displayNameAction": "Set child protection lock",
+                            "type": "bool",
+                            "defaultValue": false,
+                            "writable": true
+                        },
+                        {
+                            "id": "288c6bcf-afa4-4851-87b5-d23c008ec771",
+                            "name": "mode",
+                            "displayName": "Mode",
+                            "displayNameAction": "Set mode",
+                            "type": "uint",
+                            "possibleValues": [
+                                {
+                                    "value": 0,
+                                    "displayName": "Off"
+                                },
+                                {
+                                    "value": 1,
+                                    "displayName": "Auto"
+                                },
+                                {
+                                    "value": 2,
+                                    "displayName": "Manual"
+                                }
+                            ],
+                            "defaultValue": 1,
+                            "writable": true
+                        }
+                    ]
                 }
             ]
         }
