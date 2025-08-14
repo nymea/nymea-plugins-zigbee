@@ -1,0 +1,136 @@
+Source: nymea-plugins-zigbee
+Section: utils
+Priority: options
+Maintainer: nymea GmbH <developer@nymea.io>
+Standards-Version: 4.7.2
+Build-depends: debhelper,
+               libnymea-dev,
+               libnymea-zigbee-dev,
+               nymea-dev-tools:native,
+               pkg-config,
+               qt6-base-dev,
+               qt6-base-dev-tools,
+
+
+Package: nymea-plugin-zigbee-develco
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Description: nymea integration plugin for Develco ZigBee devices
+ This package contains the nymea integration plugin for ZigBee based devices
+ made by Develco.
+
+
+Package: nymea-plugin-zigbee-eurotronic
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Description: nymea integration plugin for Eurotronic devices
+ This package contains the nymea integration plugin for ZigBee devices
+ made by Eurotronic.
+
+
+Package: nymea-plugin-zigbee-generic
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Conflicts: nymea-plugin-zigbee-generic-lights
+Replaces: nymea-plugin-zigbee-generic-lights
+Description: nymea integration plugin for ZigBee Spec compliant devices
+ This package contains the nymea integration plugin for ZigBee devices which
+ adhere to the ZigBee Cluster Library specification and thus can be handled
+ in a unified and generic manner.
+
+
+Package: nymea-plugin-zigbee-gewiss
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Description: nymea integration plugin for ZigBee devices by Gewiss
+ This package contains the nymea integration plugin for ZigBee devices
+ made by Gewiss.
+
+
+Package: nymea-plugin-zigbee-jung
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Replaces: nymea-plugin-zigbee-remotes
+Conflicts: nymea-plugin-zigbee-remotes
+Description: nymea integration plugin for Zigbee devices by Jung.
+ This package contains the nymea integration plugin for ZigBee devices
+ by Jung.
+
+
+Package: nymea-plugin-zigbee-lumi
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Description: nymea integration plugin for ZigBee based lumi/aqara/xiaomi devices
+ This package contains the nymea integration plugin for ZigBee based devices made
+ by Lumi, often also brandet as Aqara or Xiami Mii.
+
+
+Package: nymea-plugin-zigbee-osram
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Description: nymea integration plugin for ZigBee based Osram Lightify devices
+ This package contains the nymea integration plugin for ZigBee based devices made
+ by Osram, marketed under the Lightfy brand.
+
+
+Package: nymea-plugin-zigbee-philipshue
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Description: nymea integration plugin for Philips Hue devices via ZigBee
+ This package contains the nymea integration plugin for Philips Hue devices.
+ Please note that this plugin does not work togehter with a Hue Bridge but instead
+ connects to the devices directly via ZigBee without the need of a Hue bridge.
+
+
+Package: nymea-plugin-zigbee-tradfri
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Description: nymea integration plugin for ZigBee based Ikea TRADFRI devices
+ This package contains the nymea integration plugin for ZigBee based devices by
+ Ikea, known as TRADFRI. Please note that this plugin does not work together
+ with a TRADFRI bridge but instead connects to the devices directly via ZigBee
+ without the need of a TRADFRI bridge.
+
+
+Package: nymea-plugin-zigbee-tuya
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Description: nymea integration plugin for ZigBee based Tuya devices
+ This package contains the nymea integration plugin for ZigBee based devices by
+ Tuya and rebranded as various products.
+
+
+Package: nymea-plugin-zigbee-schneiderelectric
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+Description: nymea integration plugin for ZigBee based Schneider Electric devices
+ This package contains the nymea integration plugin for ZigBee based devices by
+ Schneider Electric.
+
+
+Package: nymea-plugins-zigbee
+Section: libs    
+Architecture: all
+Depends: nymea-plugin-zigbee-develco,
+         nymea-plugin-zigbee-eurotronic,
+         nymea-plugin-zigbee-generic,
+         nymea-plugin-zigbee-gewiss,
+         nymea-plugin-zigbee-jung,
+         nymea-plugin-zigbee-lumi,
+         nymea-plugin-zigbee-philipshue,
+         nymea-plugin-zigbee-tradfri,
+         nymea-plugin-zigbee-tuya,
+         nymea-plugin-zigbee-schneiderelectric,
+Description: ZigBee integration plugins for nymea - meta package
+ This package will install all ZigBee related integration plugins for nymea.
