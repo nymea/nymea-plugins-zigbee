@@ -147,7 +147,11 @@ DpValue DpValue::fromData(const QByteArray &data)
 QByteArray DpValue::toData() const
 {
     QByteArray ret;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QDataStream stream(&ret, QDataStream::WriteOnly);
+#else
     QDataStream stream(&ret, QIODevice::WriteOnly);
+#endif
     stream << m_sequence;
     stream << m_dp;
     stream << static_cast<quint8>(m_type);

@@ -41,12 +41,14 @@
 #include <zcl/measurement/zigbeeclusterilluminancemeasurement.h>
 #include <zcl/manufacturerspecific/philips/zigbeeclustermanufacturerspecificphilips.h>
 
-
 #include <math.h>
 
 #include <QSslCertificate>
 #include <QSslSocket>
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+#include <QSslConfiguration>
+#endif
 
 IntegrationPluginZigbeePhilipsHue::IntegrationPluginZigbeePhilipsHue():
     ZigbeeIntegrationPlugin(ZigbeeHardwareResource::HandlerTypeVendor, dcZigbeePhilipsHue())
@@ -86,7 +88,16 @@ void IntegrationPluginZigbeePhilipsHue::init()
 
     foreach (const QSslCertificate &cert, QSslCertificate::fromData(cacertsData)) {
         qCDebug(dcZigbeePhilipsHue()) << "Adding certificate for firmware server:" << cert;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        QSslConfiguration defaultConfiguration = QSslConfiguration::defaultConfiguration();
+        if (defaultConfiguration.caCertificates().isEmpty())
+            defaultConfiguration.addCaCertificates(QSslConfiguration::systemCaCertificates());
+
+        defaultConfiguration.addCaCertificate(cert);
+        QSslConfiguration::setDefaultConfiguration(defaultConfiguration);
+#else
         QSslSocket::addDefaultCaCertificate(cert);
+#endif
     }
 }
 
