@@ -61,30 +61,43 @@ void IntegrationPluginZigbeePhilipsHue::init()
 
     // Hue servers started to use a self signed certificate for their firmware update server
     // See: https://github.com/Koenkk/zigbee-OTA/issues/420
-    QByteArray cacertsData = "-----BEGIN CERTIFICATE-----\n"
-            "MIIBwDCCAWagAwIBAgIJAJtrMkoTxs+WMAoGCCqGSM49BAMCMDIxCzAJBgNVBAYT\n"
-            "Ak5MMRQwEgYDVQQKDAtQaGlsaXBzIEh1ZTENMAsGA1UEAwwEcm9vdDAgFw0xNjA4\n"
-            "MjUwNzU5NDNaGA8yMDY4MDEwNTA3NTk0M1owMjELMAkGA1UEBhMCTkwxFDASBgNV\n"
-            "BAoMC1BoaWxpcHMgSHVlMQ0wCwYDVQQDDARyb290MFkwEwYHKoZIzj0CAQYIKoZI\n"
-            "zj0DAQcDQgAEENC1JOl6BxJrwCb+YK655zlM57VKFSi5OHDsmlCaF/EfTGGgU08/\n"
-            "JUtkCyMlHUUoYBZyzCBKXqRKkrT512evEKNjMGEwHQYDVR0OBBYEFAlkFYACVzir\n"
-            "qTr++cWia8AKH/fOMB8GA1UdIwQYMBaAFAlkFYACVzirqTr++cWia8AKH/fOMA8G\n"
-            "A1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgGGMAoGCCqGSM49BAMCA0gAMEUC\n"
-            "IQDcGfyXaUl5hjr5YE8m2piXhMcDzHTNbO1RvGgz4r9IswIgFTTw/R85KyfIiW+E\n"
-            "clwJRVSsq8EApeFREenCkRM0EIk=\n"
-            "-----END CERTIFICATE-----\n"
-            "-----BEGIN CERTIFICATE-----\n"
-            "MIIBwDCCAWagAwIBAgIJAJtrMkoTxs+WMAoGCCqGSM49BAMCMDIxCzAJBgNVBAYT\n"
-            "Ak5MMRQwEgYDVQQKDAtQaGlsaXBzIEh1ZTENMAsGA1UEAwwEcm9vdDAgFw0xNjA4\n"
-            "MjUwNzU5NDNaGA8yMDY4MDEwNTA3NTk0M1owMjELMAkGA1UEBhMCTkwxFDASBgNV\n"
-            "BAoMC1BoaWxpcHMgSHVlMQ0wCwYDVQQDDARyb290MFkwEwYHKoZIzj0CAQYIKoZI\n"
-            "zj0DAQcDQgAEENC1JOl6BxJrwCb+YK655zlM57VKFSi5OHDsmlCaF/EfTGGgU08/\n"
-            "JUtkCyMlHUUoYBZyzCBKXqRKkrT512evEKNjMGEwHQYDVR0OBBYEFAlkFYACVzir\n"
-            "qTr++cWia8AKH/fOMB8GA1UdIwQYMBaAFAlkFYACVzirqTr++cWia8AKH/fOMA8G\n"
-            "A1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgGGMAoGCCqGSM49BAMCA0gAMEUC\n"
-            "IQDcGfyXaUl5hjr5YE8m2piXhMcDzHTNbO1RvGgz4r9IswIgFTTw/R85KyfIiW+E\n"
-            "clwJRVSsq8EApeFREenCkRM0EIk=\n"
-            "-----END CERTIFICATE-----\n";
+    QByteArray cacertsData = "-----BEGIN CERTIFICATE-----"
+                             "MIICCzCCAbGgAwIBAgIUAJhpAVcBayE7gVKK/rntcEfzvugwCgYIKoZIzj0EAwIw"
+                             "NzELMAkGA1UEBhMCTkwxFDASBgNVBAoTC1BoaWxpcHMgSHVlMRIwEAYDVQQDEwlI"
+                             "dWUgQ0EgMDEwHhcNMjQwNjA2MDgwMjU5WhcNMjUwNjA2MDgwMjU4WjA+MQswCQYD"
+                             "VQQGEwJOTDEUMBIGA1UEChMLUGhpbGlwcyBIdWUxGTAXBgNVBAMTEG90YXUubWVl"
+                             "dGh1ZS5jb20wWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAATBg7n3bDtBQEfM0EJH"
+                             "u+eYbOBlvX6neq4UuBAGFa9PIimXzWmU8/RplQrXQKxalWj92YBzqqkgtDjvfNod"
+                             "spcGo4GTMIGQMA4GA1UdDwEB/wQEAwIFoDATBgNVHSUEDDAKBggrBgEFBQcDATAM"
+                             "BgNVHRMBAf8EAjAAMB0GA1UdDgQWBBRA+Hr45ToaCbdANIXfJpENgvC0QzAfBgNV"
+                             "HSMEGDAWgBRYRIhV1AQaN/wD1ZtftI9bHhPwjDAbBgNVHREEFDASghBvdGF1Lm1l"
+                             "ZXRodWUuY29tMAoGCCqGSM49BAMCA0gAMEUCIQDOElzi+Vs//wdLUpBMes7tiIqK"
+                             "L4fAa9iJjBRYnrOgpAIgUPGhBwdxBlwwaJVPQS98RZUJWAB3j+elK3JgNv7FoMQ="
+                             "-----END CERTIFICATE-----"
+                             "-----BEGIN CERTIFICATE-----"
+                             "MIIBvzCCAWWgAwIBAgICEAUwCgYIKoZIzj0EAwIwMjELMAkGA1UEBhMCTkwxFDAS"
+                             "BgNVBAoMC1BoaWxpcHMgSHVlMQ0wCwYDVQQDDARyb290MB4XDTI0MDYwNDExNDIz"
+                             "MVoXDTI5MDcyNDExNDIzMVowNzELMAkGA1UEBhMCTkwxFDASBgNVBAoTC1BoaWxp"
+                             "cHMgSHVlMRIwEAYDVQQDEwlIdWUgQ0EgMDEwWTATBgcqhkjOPQIBBggqhkjOPQMB"
+                             "BwNCAAQb2UaBzJn6v4vrmfr62tasGImR/9TVaLS8y2Ac4EJCIGuILCCadmn7M59O"
+                             "OxqXLVpa/0n0KKYcriKLW7fhZaZEo2YwZDAdBgNVHQ4EFgQUWESIVdQEGjf8A9Wb"
+                             "X7SPWx4T8IwwHwYDVR0jBBgwFoAUCWQVgAJXOKupOv75xaJrwAof984wEgYDVR0T"
+                             "AQH/BAgwBgEB/wIBADAOBgNVHQ8BAf8EBAMCAYYwCgYIKoZIzj0EAwIDSAAwRQIh"
+                             "AOXUFvMNXl0WgUGoEYVl4DQI+SdJxh/kTfJzTWvBRXoSAiAz1QXujFSdA0fNRgFw"
+                             "sDjggIVrV/dqOmNO/wQvRwQAZQ=="
+                             "-----END CERTIFICATE-----"
+                             "-----BEGIN CERTIFICATE-----"
+                             "MIIBwDCCAWagAwIBAgIJAJtrMkoTxs+WMAoGCCqGSM49BAMCMDIxCzAJBgNVBAYT"
+                             "Ak5MMRQwEgYDVQQKDAtQaGlsaXBzIEh1ZTENMAsGA1UEAwwEcm9vdDAgFw0xNjA4"
+                             "MjUwNzU5NDNaGA8yMDY4MDEwNTA3NTk0M1owMjELMAkGA1UEBhMCTkwxFDASBgNV"
+                             "BAoMC1BoaWxpcHMgSHVlMQ0wCwYDVQQDDARyb290MFkwEwYHKoZIzj0CAQYIKoZI"
+                             "zj0DAQcDQgAEENC1JOl6BxJrwCb+YK655zlM57VKFSi5OHDsmlCaF/EfTGGgU08/"
+                             "JUtkCyMlHUUoYBZyzCBKXqRKkrT512evEKNjMGEwHQYDVR0OBBYEFAlkFYACVzir"
+                             "qTr++cWia8AKH/fOMB8GA1UdIwQYMBaAFAlkFYACVzirqTr++cWia8AKH/fOMA8G"
+                             "A1UdEwEB/wQFMAMBAf8wDgYDVR0PAQH/BAQDAgGGMAoGCCqGSM49BAMCA0gAMEUC"
+                             "IQDcGfyXaUl5hjr5YE8m2piXhMcDzHTNbO1RvGgz4r9IswIgFTTw/R85KyfIiW+E"
+                             "clwJRVSsq8EApeFREenCkRM0EIk="
+                             "-----END CERTIFICATE-----";
 
     foreach (const QSslCertificate &cert, QSslCertificate::fromData(cacertsData)) {
         qCDebug(dcZigbeePhilipsHue()) << "Adding certificate for firmware server:" << cert;
@@ -120,8 +133,8 @@ bool IntegrationPluginZigbeePhilipsHue::handleNode(ZigbeeNode *node, const QUuid
         // Dimmable light
         if ((endpoint->profile() == Zigbee::ZigbeeProfile::ZigbeeProfileLightLink &&
              endpoint->deviceId() == Zigbee::LightLinkDevice::LightLinkDeviceDimmableLight) ||
-                (endpoint->profile() == Zigbee::ZigbeeProfile::ZigbeeProfileHomeAutomation &&
-                 endpoint->deviceId() == Zigbee::HomeAutomationDeviceDimmableLight)) {
+            (endpoint->profile() == Zigbee::ZigbeeProfile::ZigbeeProfileHomeAutomation &&
+             endpoint->deviceId() == Zigbee::HomeAutomationDeviceDimmableLight)) {
 
             qCDebug(dcZigbeePhilipsHue()) << "Handling dimmable light for" << node << endpoint;
             createThing(dimmableLightThingClassId, node);
@@ -131,8 +144,8 @@ bool IntegrationPluginZigbeePhilipsHue::handleNode(ZigbeeNode *node, const QUuid
         // CT light
         if ((endpoint->profile() == Zigbee::ZigbeeProfileLightLink &&
              endpoint->deviceId() == Zigbee::LightLinkDeviceColourTemperatureLight) ||
-                (endpoint->profile() == Zigbee::ZigbeeProfileHomeAutomation &&
-                 endpoint->deviceId() == Zigbee::HomeAutomationDeviceColourTemperatureLight)) {
+            (endpoint->profile() == Zigbee::ZigbeeProfileHomeAutomation &&
+             endpoint->deviceId() == Zigbee::HomeAutomationDeviceColourTemperatureLight)) {
 
             qCDebug(dcZigbeePhilipsHue()) << "Handling color temperature light for" << node << endpoint;
             createThing(colorTemperatureLightThingClassId, node);
@@ -157,9 +170,9 @@ bool IntegrationPluginZigbeePhilipsHue::handleNode(ZigbeeNode *node, const QUuid
 
         // Dimmer switch
         if (endpointOne->profile() == Zigbee::ZigbeeProfileLightLink &&
-                endpointOne->deviceId() == Zigbee::LightLinkDeviceNonColourSceneController &&
-                endpointTwo->profile() == Zigbee::ZigbeeProfileHomeAutomation &&
-                endpointTwo->deviceId() == Zigbee::HomeAutomationDeviceSimpleSensor) {
+            endpointOne->deviceId() == Zigbee::LightLinkDeviceNonColourSceneController &&
+            endpointTwo->profile() == Zigbee::ZigbeeProfileHomeAutomation &&
+            endpointTwo->deviceId() == Zigbee::HomeAutomationDeviceSimpleSensor) {
 
             qCDebug(dcZigbeePhilipsHue()) << "Handling Hue dimmer switch" << node << endpointOne << endpointTwo;
             createThing(dimmerSwitchThingClassId, node);
@@ -171,9 +184,9 @@ bool IntegrationPluginZigbeePhilipsHue::handleNode(ZigbeeNode *node, const QUuid
 
         // Motion sensor (Indoor and outdoor)
         if (endpointOne->profile() == Zigbee::ZigbeeProfileLightLink &&
-                endpointOne->deviceId() == Zigbee::LightLinkDeviceOnOffSensor &&
-                endpointTwo->profile() == Zigbee::ZigbeeProfileHomeAutomation &&
-                endpointTwo->deviceId() == Zigbee::HomeAutomationDeviceOccupacySensor) {
+            endpointOne->deviceId() == Zigbee::LightLinkDeviceOnOffSensor &&
+            endpointTwo->profile() == Zigbee::ZigbeeProfileHomeAutomation &&
+            endpointTwo->deviceId() == Zigbee::HomeAutomationDeviceOccupacySensor) {
 
             qCDebug(dcZigbeePhilipsHue()) << "Handling Hue motion sensor" << node << endpointOne << endpointTwo;
 
@@ -203,7 +216,7 @@ bool IntegrationPluginZigbeePhilipsHue::handleNode(ZigbeeNode *node, const QUuid
 
         // Smart buttton
         if (endpointOne->profile() == Zigbee::ZigbeeProfileHomeAutomation &&
-                endpointOne->deviceId() == Zigbee::HomeAutomationDeviceNonColourSceneController) {
+            endpointOne->deviceId() == Zigbee::HomeAutomationDeviceNonColourSceneController) {
             qCDebug(dcZigbeePhilipsHue()) << "Handling Hue Smart button" << node << endpointOne;
             createThing(smartButtonThingClassId, node);
             bindCluster(endpointOne, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
@@ -215,7 +228,7 @@ bool IntegrationPluginZigbeePhilipsHue::handleNode(ZigbeeNode *node, const QUuid
 
         // Wall switch module
         if (endpointOne->profile() == Zigbee::ZigbeeProfileHomeAutomation &&
-                endpointOne->deviceId() == Zigbee::HomeAutomationDeviceNonColourController) {
+            endpointOne->deviceId() == Zigbee::HomeAutomationDeviceNonColourController) {
             createThing(wallSwitchModuleThingClassId, node);
             bindManufacturerSpecificPhilipsCluster(endpointOne);
             bindCluster(endpointOne, ZigbeeClusterLibrary::ClusterIdPowerConfiguration);
@@ -255,8 +268,8 @@ void IntegrationPluginZigbeePhilipsHue::createConnections(Thing *thing)
 
 
     if (thing->thingClassId() == dimmableLightThingClassId
-            || thing->thingClassId() == colorTemperatureLightThingClassId
-            || thing->thingClassId() == colorLightThingClassId) {
+        || thing->thingClassId() == colorTemperatureLightThingClassId
+        || thing->thingClassId() == colorLightThingClassId) {
 
         ZigbeeNodeEndpoint *endpoint = node->getEndpoint(11);
         connectToOnOffInputCluster(thing, endpoint);
@@ -472,7 +485,7 @@ void IntegrationPluginZigbeePhilipsHue::createConnections(Thing *thing)
     }
 
     if (thing->thingClassId() == motionSensorThingClassId) {
-//        ZigbeeNodeEndpoint *endpoint1 = node->getEndpoint(0x01);
+        //        ZigbeeNodeEndpoint *endpoint1 = node->getEndpoint(0x01);
         ZigbeeNodeEndpoint *endpoint2 = node->getEndpoint(0x02);
 
         connectToPowerConfigurationInputCluster(thing, endpoint2);
@@ -551,8 +564,8 @@ void IntegrationPluginZigbeePhilipsHue::executeAction(ThingActionInfo *info)
 
     ZigbeeNodeEndpoint *endpoint = nullptr;
     if (info->thing()->thingClassId() == dimmableLightThingClassId
-            || info->thing()->thingClassId() == colorTemperatureLightThingClassId
-            || info->thing()->thingClassId() == colorLightThingClassId) {
+        || info->thing()->thingClassId() == colorTemperatureLightThingClassId
+        || info->thing()->thingClassId() == colorLightThingClassId) {
         endpoint = node->getEndpoint(11);
     } else if (info->thing()->thingClassId() == dimmerSwitchThingClassId
                || info->thing()->thingClassId() == motionSensorThingClassId) {
