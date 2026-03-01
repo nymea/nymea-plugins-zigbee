@@ -393,7 +393,7 @@ void ZigbeeIntegrationPlugin::configureMeteringInputClusterAttributeReporting(Zi
     currentSummationConfig.dataType = Zigbee::Uint48;
     currentSummationConfig.minReportingInterval = 5;
     currentSummationConfig.maxReportingInterval = 120;
-    currentSummationConfig.reportableChange = ZigbeeDataType(1, Zigbee::Uint48).data();
+    currentSummationConfig.reportableChange = ZigbeeDataType(static_cast<quint64>(1), Zigbee::Uint48).data();
 
     ZigbeeClusterReply *reportingReply = meteringCluster->configureReporting({instantaneousDemandConfig, currentSummationConfig});
     connect(reportingReply, &ZigbeeClusterReply::finished, this, [=](){
