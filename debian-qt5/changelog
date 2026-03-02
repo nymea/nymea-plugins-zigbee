@@ -1,3 +1,10 @@
+nymea-plugins-zigbee (1.14.2) noble; urgency=medium
+
+  [ Florian Wagner ]
+  * Typecast to get the correct constructor.
+
+ -- jenkins <developer@nymea.io>  Mon, 02 Mar 2026 09:31:08 +0100
+
 nymea-plugins-zigbee (1.14.1) noble; urgency=medium
 
 
