@@ -50,7 +50,7 @@ public:
     void executeAction(ThingActionInfo *info) override;
 
 protected:
-    void createThing(const ThingClassId &thingClassId, ZigbeeNode *node, int endpointId);
+    void createThingForEndpoint(const ThingClassId &thingClassId, ZigbeeNode *node, int endpointId);
 
 private:
     ZigbeeNodeEndpoint *findEndpoint(Thing *thing);

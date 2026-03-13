@@ -58,7 +58,7 @@ bool IntegrationPluginZigbeeGeneric::handleNode(ZigbeeNode *node, const QUuid &/
 
             qCDebug(dcZigbeeGeneric()) << "Handling on/off light for" << node << endpoint;
             configureOnOffInputClusterAttributeReporting(endpoint);
-            createThing(onOffLightThingClassId, node, endpoint->endpointId());
+            createThingForEndpoint(onOffLightThingClassId, node, endpoint->endpointId());
             handled = true;
         }
 
@@ -72,7 +72,7 @@ bool IntegrationPluginZigbeeGeneric::handleNode(ZigbeeNode *node, const QUuid &/
             configureOnOffInputClusterAttributeReporting(endpoint);
             bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdLevelControl);
             configureLevelControlInputClusterAttributeReporting(endpoint);
-            createThing(dimmableLightThingClassId, node, endpoint->endpointId());
+            createThingForEndpoint(dimmableLightThingClassId, node, endpoint->endpointId());
             handled = true;
         }
 
@@ -86,7 +86,7 @@ bool IntegrationPluginZigbeeGeneric::handleNode(ZigbeeNode *node, const QUuid &/
             configureOnOffInputClusterAttributeReporting(endpoint);
             bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdLevelControl);
             configureLevelControlInputClusterAttributeReporting(endpoint);
-            createThing(colorTemperatureLightThingClassId, node, endpoint->endpointId());
+            createThingForEndpoint(colorTemperatureLightThingClassId, node, endpoint->endpointId());
             handled = true;
         }
 
@@ -100,7 +100,7 @@ bool IntegrationPluginZigbeeGeneric::handleNode(ZigbeeNode *node, const QUuid &/
             configureOnOffInputClusterAttributeReporting(endpoint);
             bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdLevelControl);
             configureLevelControlInputClusterAttributeReporting(endpoint);
-            createThing(colorLightThingClassId, node, endpoint->endpointId());
+            createThingForEndpoint(colorLightThingClassId, node, endpoint->endpointId());
             handled = true;
         }
 
@@ -112,7 +112,7 @@ bool IntegrationPluginZigbeeGeneric::handleNode(ZigbeeNode *node, const QUuid &/
             configurePowerConfigurationInputClusterAttributeReporting(endpoint);
             bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdThermostat);
             configureThermostatClusterAttributeReporting(endpoint);
-            createThing(thermostatThingClassId, node, endpoint->endpointId());
+            createThingForEndpoint(thermostatThingClassId, node, endpoint->endpointId());
             handled = true;
         }
 
@@ -133,11 +133,11 @@ bool IntegrationPluginZigbeeGeneric::handleNode(ZigbeeNode *node, const QUuid &/
                     qCDebug(dcZigbeeGeneric()) << "Handling power socket with energy metering for" << node << endpoint;
                     bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdMetering);
                     configureMeteringInputClusterAttributeReporting(endpoint);
-                    createThing(powerMeterSocketThingClassId, node, endpoint->endpointId());
+                    createThingForEndpoint(powerMeterSocketThingClassId, node, endpoint->endpointId());
 
                 } else {
                     qCDebug(dcZigbeeGeneric()) << "Handling power socket endpoint for" << node << endpoint;
-                    createThing(powerSocketThingClassId, node, endpoint->endpointId());
+                    createThingForEndpoint(powerSocketThingClassId, node, endpoint->endpointId());
                 }
 
                 handled = true;
@@ -158,7 +158,7 @@ bool IntegrationPluginZigbeeGeneric::handleNode(ZigbeeNode *node, const QUuid &/
                 bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdDoorLock);
                 configureDoorLockInputClusterAttributeReporting(endpoint);
 
-                createThing(doorLockThingClassId, node, endpoint->endpointId());
+                createThingForEndpoint(doorLockThingClassId, node, endpoint->endpointId());
 
                 handled = true;
             }
@@ -195,19 +195,19 @@ bool IntegrationPluginZigbeeGeneric::handleNode(ZigbeeNode *node, const QUuid &/
                 switch (iasZoneTypeRecord.dataType.toUInt16()) {
                 case ZigbeeClusterIasZone::ZoneTypeContactSwitch:
                     qCInfo(dcZigbeeGeneric()) << "Creating contact switch thing";
-                    createThing(doorSensorThingClassId, node, endpoint->endpointId());
+                    createThingForEndpoint(doorSensorThingClassId, node, endpoint->endpointId());
                     break;
                 case ZigbeeClusterIasZone::ZoneTypeMotionSensor:
                     qCInfo(dcZigbeeGeneric()) << "Creating motion sensor thing";
-                    createThing(motionSensorThingClassId, node, endpoint->endpointId());
+                    createThingForEndpoint(motionSensorThingClassId, node, endpoint->endpointId());
                     break;
                 case ZigbeeClusterIasZone::ZoneTypeFireSensor:
                     qCInfo(dcZigbeeGeneric()) << "Fire sensor thing";
-                    createThing(fireSensorThingClassId, node, endpoint->endpointId());
+                    createThingForEndpoint(fireSensorThingClassId, node, endpoint->endpointId());
                     break;
                 case ZigbeeClusterIasZone::ZoneTypeWaterSensor:
                     qCInfo(dcZigbeeGeneric()) << "Water sensor thing";
-                    createThing(waterSensorThingClassId, node, endpoint->endpointId());
+                    createThingForEndpoint(waterSensorThingClassId, node, endpoint->endpointId());
                     break;
                 default:
                     qCWarning(dcZigbeeGeneric()) << "Unhandled IAS Zone device type:" << "0x" + QString::number(iasZoneTypeRecord.dataType.toUInt16(), 16);
@@ -228,12 +228,12 @@ bool IntegrationPluginZigbeeGeneric::handleNode(ZigbeeNode *node, const QUuid &/
 
             if (endpoint->hasInputCluster(ZigbeeClusterLibrary::ClusterIdRelativeHumidityMeasurement)) {
                 qCInfo(dcZigbeeGeneric()) << "H/T sensor device found!";
-                createThing(htSensorThingClassId, node, endpoint->endpointId());
+                createThingForEndpoint(htSensorThingClassId, node, endpoint->endpointId());
                 bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdRelativeHumidityMeasurement);
                 configureRelativeHumidityMeasurementInputClusterAttributeReporting(endpoint);
             } else {
                 qCInfo(dcZigbeeGeneric()) << "Temperature sensor device found!";
-                createThing(temperatureSensorThingClassId, node, endpoint->endpointId());
+                createThingForEndpoint(temperatureSensorThingClassId, node, endpoint->endpointId());
             }
 
             handled = true;
@@ -247,7 +247,7 @@ bool IntegrationPluginZigbeeGeneric::handleNode(ZigbeeNode *node, const QUuid &/
             bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdOnOff);
             bindCluster(endpoint, ZigbeeClusterLibrary::ClusterIdLevelControl);
 
-            createThing(remoteControlThingClassId, node, endpoint->endpointId());
+            createThingForEndpoint(remoteControlThingClassId, node, endpoint->endpointId());
             handled = true;
         }
     }
@@ -569,7 +569,7 @@ void IntegrationPluginZigbeeGeneric::executeAction(ThingActionInfo *info)
     info->finish(Thing::ThingErrorUnsupportedFeature);
 }
 
-void IntegrationPluginZigbeeGeneric::createThing(const ThingClassId &thingClassId, ZigbeeNode *node, int endpointId)
+void IntegrationPluginZigbeeGeneric::createThingForEndpoint(const ThingClassId &thingClassId, ZigbeeNode *node, int endpointId)
 {
     ParamList params = {
         Param(supportedThings().findById(thingClassId).paramTypes().findByName("endpointId").id(), endpointId),

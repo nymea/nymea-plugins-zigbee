@@ -95,9 +95,9 @@ DpValue DpValue::fromData(const QByteArray &data)
     }
     case TypeRaw:
     case TypeString: {
-        char tmp[len];
-        stream.readRawData(tmp, len);
-        value = QByteArray(tmp, len);
+        QByteArray tmp(len, '\0');
+        stream.readRawData(tmp.data(), len);
+        value = tmp;
         break;
     }
     case TypeEnum: {
