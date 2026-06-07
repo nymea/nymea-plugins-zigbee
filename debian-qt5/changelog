@@ -1,3 +1,10 @@
+nymea-plugins-zigbee (1.15.1) noble; urgency=medium
+
+  [ Simon Stürz ]
+  * Add nymea-plugin-osram to the meta-package
+
+ -- jenkins <developer@nymea.io>  Sun, 07 Jun 2026 09:33:51 +0200
+
 nymea-plugins-zigbee (1.15.0) noble; urgency=medium
 
   [ Simon Stürz ]
