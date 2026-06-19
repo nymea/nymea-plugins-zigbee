@@ -1,3 +1,8 @@
+nymea-plugins-zigbee (1.15.2) resolute; urgency=medium
+
+
+ -- jenkins <developer@nymea.io>  Fri, 19 Jun 2026 13:36:57 +0200
+
 nymea-plugins-zigbee (1.15.1) noble; urgency=medium
 
   [ Simon Stürz ]
